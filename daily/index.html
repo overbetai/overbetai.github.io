@@ -898,6 +898,15 @@ self.my_profit += my_payoff`, false],
             const pieText = document.querySelector('.pie-text');
 
             if (isPositive) {
+                if (averageScore > 0) {
+                    document.querySelectorAll('.negative-slice').forEach((slice) => {
+                        slice.style.display = 'none';
+                        console.log(slice);
+                    });
+                    document.querySelectorAll('.positive-slice').forEach((slice) => {
+                        slice.style.display = 'block';
+                    });
+                }
                 activePieSlice.style.transform = `rotate(${(percentage - 0.5) * 360}deg)`;
                 activeMaskSlice.style.transform = `rotate(${(percentage + 0) * 360}deg)`;
                 document.querySelector('.mask-slice.base-slice').style.transform = 'rotate(180deg)';
@@ -909,6 +918,15 @@ self.my_profit += my_payoff`, false],
                     activeMaskSlice.style.display = 'block';
                 }
             } else {
+                if (averageScore < 0) {
+                    document.querySelectorAll('.negative-slice').forEach((slice) => {
+                        slice.style.display = 'block';
+                    });
+                    document.querySelectorAll('.positive-slice').forEach((slice) => {
+                        slice.style.display = 'none';
+                        console.log(slice);
+                    });
+                }
                 document.querySelector('.mask-slice.base-slice').style.transform = 'rotate(0deg)';
                 activePieSlice.style.transform = `rotate(${(percentage - 0) * 360}deg)`;
                 activeMaskSlice.style.transform = `rotate(${(percentage + 0.5) * 360}deg)`;
