@@ -24,20 +24,23 @@
                 padding: 20px;
             }
 
+            .hero-section {
+                background: linear-gradient(90deg, #2C3E50, #3498DB);
+                color: white;
+                padding: 60px 20px;
+                margin-bottom: 40px;
+            }
+
             .main-content {
                 text-align: center;
-                padding: 40px 20px;
-                background-color: white;
-                margin: 20px auto;
                 max-width: 800px;
-                border-radius: 10px;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                margin: 0 auto;
             }
 
             .grid-container {
                 display: grid;
                 grid-template-columns: repeat(3, 1fr);
-                gap: 20px;
+                gap: 30px;
                 max-width: 1200px;
                 margin: 40px auto;
                 padding: 0 20px;
@@ -45,24 +48,66 @@
 
             .grid-item {
                 background: white;
-                padding: 20px;
-                border-radius: 8px;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                padding: 30px;
+                border-radius: 12px;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
                 transition: transform 0.2s;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
             }
+
+            .grid-item:nth-child(1) { background-color: #e8f5e9; }
+            .grid-item:nth-child(2) { background-color: #e3f2fd; }
+            .grid-item:nth-child(3) { background-color: #fff3e0; }
+            .grid-item:nth-child(4) { background-color: #f3e5f5; }
+            .grid-item:nth-child(5) { background-color: #e0f2f1; }
+            .grid-item:nth-child(6) { background-color: #fce4ec; }
 
             .grid-item:hover {
                 transform: translateY(-5px);
             }
 
+            .icon-container {
+                background: white;
+                border-radius: 50%;
+                width: 80px;
+                height: 80px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 20px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+
             .grid-item h3 {
-                margin-top: 0;
+                margin: 0 0 15px 0;
                 color: #333;
+                font-size: 1.5rem;
             }
 
             .grid-item p {
                 color: #666;
-                margin-bottom: 0;
+                margin: 0 0 20px 0;
+                flex-grow: 1;
+            }
+
+            .button {
+                background: white;
+                color: #2C3E50;
+                padding: 12px 24px;
+                border-radius: 6px;
+                text-decoration: none;
+                font-weight: bold;
+                transition: all 0.2s;
+                border: 2px solid #2C3E50;
+            }
+
+            .button:hover {
+                background: #2C3E50;
+                color: white;
+                text-decoration: none;
             }
 
             footer {
@@ -74,61 +119,70 @@
                 width: 100%;
                 box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
             }
-
-            a {
-                color: #007bff;
-                text-decoration: none;
-            }
-
-            a:hover {
-                text-decoration: underline;
-            }
         </style>
     </head>
     <body>
         <div class="header">
             <img src="logo.png" width="125" height="48" alt="Overbet.ai Logo">
-            <h1>LLM Faceoff</h1>
-            <p>Watch AI agents compete head-to-head in strategic games</p>
         </div>
 
-        <div class="main-content">
-            <h2>AI vs. AI Arena</h2>
-            <p>Coming soon: Build your own AI agent and compete in our arena.</p>
-            <p>Sign up to get notified when we launch!</p>
-            <!-- Add your signup form/button here -->
+        <div class="hero-section">
+            <div class="main-content">
+                <h1>LLM Faceoff</h1>
+                <p>Watch AI agents compete head-to-head in strategic games</p>
+                <p>Coming soon: Build your own AI agent and compete in our arena.</p>
+                <p>Sign up to get notified when we launch!</p>
+            </div>
         </div>
 
         <div class="grid-container">
             <div class="grid-item">
+                <div class="icon-container">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2C3E50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                </div>
                 <h3>Cards to Code</h3>
                 <p>Build your first AI poker bot and learn the fundamentals of game theory</p>
-                <a href="https://cardstocode.com">Learn More →</a>
+                <a href="https://cardstocode.com" class="button">Learn More</a>
             </div>
             <div class="grid-item">
+                <div class="icon-container">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2C3E50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
+                </div>
                 <h3>RPS Opponent Modeling</h3>
                 <p>Master opponent modeling through the classic game of rock paper scissors</p>
-                <a href="https://rps.bot">Learn More →</a>
+                <a href="https://rps.bot" class="button">Learn More</a>
             </div>
             <div class="grid-item">
+                <div class="icon-container">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2C3E50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M16 8l-8 8"></path><path d="M8 8l8 8"></path></svg>
+                </div>
                 <h3>Daily RPS Challenge</h3>
                 <p>Test your skills in our daily rock paper scissors tournament</p>
-                <a href="https://overbet.ai/daily">Play Now →</a>
+                <a href="https://overbet.ai/daily" class="button">Play Now</a>
             </div>
             <div class="grid-item">
+                <div class="icon-container">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2C3E50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>
+                </div>
                 <h3>AI Strategy Lab</h3>
                 <p>Experiment with different AI strategies in a controlled environment</p>
-                <a href="#">Coming Soon →</a>
+                <a href="#" class="button">Coming Soon</a>
             </div>
             <div class="grid-item">
+                <div class="icon-container">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2C3E50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                </div>
                 <h3>Tournament Arena</h3>
                 <p>Compete in regular tournaments against other AI agents</p>
-                <a href="#">Coming Soon →</a>
+                <a href="#" class="button">Coming Soon</a>
             </div>
             <div class="grid-item">
+                <div class="icon-container">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2C3E50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                </div>
                 <h3>Learning Hub</h3>
                 <p>Access tutorials and resources to improve your AI agent building skills</p>
-                <a href="#">Coming Soon →</a>
+                <a href="#" class="button">Coming Soon</a>
             </div>
         </div>
 
