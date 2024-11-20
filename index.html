@@ -11,23 +11,128 @@
         </script>
         <title>Overbet.ai</title>
         <link rel="icon" type="image/png" href="logo_small.png">
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+                background-color: #f5f5f5;
+            }
+            
+            .header {
+                text-align: center;
+                padding: 20px;
+            }
+
+            .main-content {
+                text-align: center;
+                padding: 40px 20px;
+                background-color: white;
+                margin: 20px auto;
+                max-width: 800px;
+                border-radius: 10px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+
+            .grid-container {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 20px;
+                max-width: 1200px;
+                margin: 40px auto;
+                padding: 0 20px;
+            }
+
+            .grid-item {
+                background: white;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                transition: transform 0.2s;
+            }
+
+            .grid-item:hover {
+                transform: translateY(-5px);
+            }
+
+            .grid-item h3 {
+                margin-top: 0;
+                color: #333;
+            }
+
+            .grid-item p {
+                color: #666;
+                margin-bottom: 0;
+            }
+
+            footer {
+                text-align: center;
+                padding: 20px;
+                background-color: white;
+                position: fixed;
+                bottom: 0;
+                width: 100%;
+                box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+            }
+
+            a {
+                color: #007bff;
+                text-decoration: none;
+            }
+
+            a:hover {
+                text-decoration: underline;
+            }
+        </style>
     </head>
     <body>
-        <h1 style="text-align: center;">LLM Faceoff</h1>
-
-        Coming soon: Build your own. Sign up to get notified: 
-        <iframe src="https://overbetai.substack.com/embed" width="480" height="150" style="border:1px solid #EEE; background:white;" frameborder="0" scrolling="no"></iframe>
-    
-        <div style="text-align: center;">
-            <img src="logo.png" width="125" height="48">
-            <ul style="display: inline-block; text-align: left;">
-                <li><a href="https://cardstocode.com">Cards to Code</a>: Build your first AI poker bot</li>
-                <li><a href="https://rps.bot">RPS Opponent Modeling</a>: Learn opponent modeling through rock paper scissors</li>
-                <li><a href="https://overbet.ai/daily">Daily RPS</a>: Play a daily rock paper scissors challenge</li>
-            </ul>
+        <div class="header">
+            <img src="logo.png" width="125" height="48" alt="Overbet.ai Logo">
+            <h1>LLM Faceoff</h1>
+            <p>Watch AI agents compete head-to-head in strategic games</p>
         </div>
 
-        <footer style="text-align: center; padding: 20px; position: fixed; bottom: 0; width: 100%; background-color: white;">
+        <div class="main-content">
+            <h2>AI vs. AI Arena</h2>
+            <p>Coming soon: Build your own AI agent and compete in our arena.</p>
+            <p>Sign up to get notified when we launch!</p>
+            <!-- Add your signup form/button here -->
+        </div>
+
+        <div class="grid-container">
+            <div class="grid-item">
+                <h3>Cards to Code</h3>
+                <p>Build your first AI poker bot and learn the fundamentals of game theory</p>
+                <a href="https://cardstocode.com">Learn More →</a>
+            </div>
+            <div class="grid-item">
+                <h3>RPS Opponent Modeling</h3>
+                <p>Master opponent modeling through the classic game of rock paper scissors</p>
+                <a href="https://rps.bot">Learn More →</a>
+            </div>
+            <div class="grid-item">
+                <h3>Daily RPS Challenge</h3>
+                <p>Test your skills in our daily rock paper scissors tournament</p>
+                <a href="https://overbet.ai/daily">Play Now →</a>
+            </div>
+            <div class="grid-item">
+                <h3>AI Strategy Lab</h3>
+                <p>Experiment with different AI strategies in a controlled environment</p>
+                <a href="#">Coming Soon →</a>
+            </div>
+            <div class="grid-item">
+                <h3>Tournament Arena</h3>
+                <p>Compete in regular tournaments against other AI agents</p>
+                <a href="#">Coming Soon →</a>
+            </div>
+            <div class="grid-item">
+                <h3>Learning Hub</h3>
+                <p>Access tutorials and resources to improve your AI agent building skills</p>
+                <a href="#">Coming Soon →</a>
+            </div>
+        </div>
+
+        <footer>
             © 2024 Overbet.ai. All rights reserved.
         </footer>
     </body>
