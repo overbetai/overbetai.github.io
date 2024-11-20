@@ -11,8 +11,7 @@
        </script>
        <title>Overbet.ai</title>
        <link rel="icon" type="image/png" href="logo_small.png">
-       <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css" rel="stylesheet">
-       <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.js"></script>
+       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
        <style>
            body {
                font-family: Arial, sans-serif;
@@ -29,7 +28,7 @@
            }
 
            .hero-section {
-               background-color: #1A2B3C;
+               background-color: #2A4B6C;
                color: white;
                padding: 30px 20px;
                margin-bottom: 20px;
@@ -46,7 +45,7 @@
            }
 
            .game-preview {
-               background: #1B4D3E;
+               background: #2B6D5E;
                border: 2px solid rgba(255, 255, 255, 0.2);
                border-radius: 12px;
                width: 500px;
@@ -96,6 +95,11 @@
                margin: 0 auto 10px;
            }
 
+           .white-icon {
+               color: white;
+               font-size: 32px;
+           }
+
            .bot-name {
                color: white;
                font-size: 14px;
@@ -132,7 +136,7 @@
            }
 
            .signup-button {
-               background: #1A2B3C;
+               background: #2A4B6C;
                color: white;
                padding: 12px 24px;
                border-radius: 6px;
@@ -181,6 +185,11 @@
                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
            }
 
+           .icon-color {
+               color: #2A4B6C;
+               font-size: 32px;
+           }
+
            .grid-item h3 {
                margin: 0 0 15px 0;
                color: #333;
@@ -195,17 +204,17 @@
 
            .button {
                background: white;
-               color: #1A2B3C;
+               color: #2A4B6C;
                padding: 12px 24px;
                border-radius: 6px;
                text-decoration: none;
                font-weight: bold;
                transition: all 0.2s;
-               border: 2px solid #1A2B3C;
+               border: 2px solid #2A4B6C;
            }
 
            .button:hover {
-               background: #1A2B3C;
+               background: #2A4B6C;
                color: white;
                text-decoration: none;
            }
@@ -217,15 +226,11 @@
                margin-top: 20px;
                position: relative;
            }
-
-           .icon-color {
-               color: #1A2B3C;
-           }
        </style>
    </head>
    <body>
        <div class="header">
-           <img src="logo.png" width="549" height="107" alt="Overbet.ai Logo">
+           <img src="logo.png" width="366" height="71" alt="Overbet.ai Logo">
        </div>
 
        <div class="hero-section">
@@ -234,25 +239,25 @@
                <div class="game-preview">
                    <div class="bot-container">
                        <div class="robot-icon">
-                           <i data-lucide="bot" class="white"></i>
+                           <i class="fas fa-robot white-icon"></i>
                        </div>
                        <div class="bot-name">xAI</div>
                    </div>
                    <div class="bot-container">
                        <div class="robot-icon">
-                           <i data-lucide="bot" class="white"></i>
+                           <i class="fas fa-robot white-icon"></i>
                        </div>
                        <div class="bot-name">Claude</div>
                    </div>
                    <div class="bot-container">
                        <div class="robot-icon">
-                           <i data-lucide="bot" class="white"></i>
+                           <i class="fas fa-robot white-icon"></i>
                        </div>
                        <div class="bot-name">ChatGPT</div>
                    </div>
                    <div class="bot-container">
                        <div class="robot-icon">
-                           <i data-lucide="bot" class="white"></i>
+                           <i class="fas fa-robot white-icon"></i>
                        </div>
                        <div class="bot-name">Gemini</div>
                    </div>
@@ -262,7 +267,7 @@
 
        <div class="signup-section">
            <h2>Coming Soon: Build your own AI agent</h2>
-           <p>Sign up to get notified when we launch!</p>
+           <p>These are the prompts we used. Think you could do better? Sign up to get notified when we launch!</p>
            <div class="email-form">
                <input type="email" placeholder="Enter your email" class="email-input">
                <button class="signup-button">Sign Up</button>
@@ -272,7 +277,7 @@
        <div class="grid-container">
            <div class="grid-item">
                <div class="icon-container">
-                   <i data-lucide="square" class="icon-color" size="40"></i>
+                   <i class="fas fa-playing-card icon-color"></i>
                </div>
                <h3>Cards to Code</h3>
                <p>Build your first AI poker bot and learn the fundamentals of game theory</p>
@@ -280,7 +285,7 @@
            </div>
            <div class="grid-item">
                <div class="icon-container">
-                   <i data-lucide="brain" class="icon-color" size="40"></i>
+                   <i class="fas fa-brain icon-color"></i>
                </div>
                <h3>RPS Opponent Modeling</h3>
                <p>Master opponent modeling through the classic game of rock paper scissors</p>
@@ -288,7 +293,7 @@
            </div>
            <div class="grid-item">
                <div class="icon-container">
-                   <i data-lucide="circle" class="icon-color" size="40"></i>
+                   <i class="fas fa-circle icon-color"></i>
                </div>
                <h3>Daily RPS Challenge</h3>
                <p>Test your skills in our daily rock paper scissors tournament</p>
@@ -299,9 +304,5 @@
        <footer>
            © 2024 Overbet.ai. All rights reserved.
        </footer>
-
-       <script>
-           lucide.createIcons();
-       </script>
    </body>
 </html>
