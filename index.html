@@ -9,8 +9,21 @@
 
        gtag('config', 'G-DV7SM4LPKG');
        </script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+        <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+        <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+        <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script> 
+
+        <script>
+            window.addEventListener('load', function() {
+                console.log('React available:', typeof React !== 'undefined');
+                console.log('ReactDOM available:', typeof ReactDOM !== 'undefined');
+            });
+        </script>
+
        <title>Overbet.ai</title>
-       <link rel="icon" type="image/png" href="logo_small.png">
+       <link rel="icon" type="image/png" href="https://overbet.ai/logo_small.png">
        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
        <style>
            body {
@@ -36,7 +49,7 @@
 
            .main-content {
                text-align: center;
-               max-width: 800px;
+               max-width: 12500px;
                margin: 0 auto;
            }
 
@@ -226,17 +239,396 @@
                margin-top: 20px;
                position: relative;
            }
-       </style>
+        </style>  
+
+        <style>
+            .layout {
+                display: grid;
+                /* Change from fixed columns to responsive */
+                grid-template-columns: 1fr;  /* Default to single column on mobile */
+                gap: 20px;
+                padding: 20px;
+                min-height: 300px;
+            }
+
+            /* Add media query for wider screens */
+            @media (min-width: 1024px) {
+                .layout {
+                    grid-template-columns: 2.5fr 1fr;  /* Original two-column layout on desktop */
+                }
+            }
+            
+            #debug-container {
+                box-sizing: border-box;
+                color: black;
+                text-align: left;
+                font-family: monospace;
+                white-space: pre-wrap;
+                padding: 20px;
+                background-color: #f5f5f5;
+                border: 1px solid #ddd;
+                max-height: 400px;
+                overflow-y: auto;
+            }
+
+            @media (max-width: 1023px) {
+                #debug-container {
+                    width: 100%;       /* Take full width only on mobile */
+                    max-height: 300px; /* Reduced height only on mobile */
+                }
+            }
+
+            #visualization-container {
+                background: white;
+                padding: 20px;
+                border: 1px solid #ddd;
+                /* zoom: 55%; */
+                min-height: 300px;
+            }
+
+            .game-visualizer {
+                width: 100%;
+                max-width: 1250px;
+                margin: 0 auto;
+                min-height: 300px;
+            }
+
+            .chip {
+                border-radius: 50%;
+                filter: drop-shadow(0 1px 1px rgba(0,0,0,0.3));
+            }
+
+            .bet-stack {
+                position: relative;
+                width: 28px;
+                height: 28px;
+            }
+
+            .bet-stack-text {
+                position: absolute;
+                color: white;
+                font-size: 14px;
+                font-weight: bold;
+                white-space: nowrap;
+            }
+
+            .bet-stack-text-right {
+                left: 36px;
+                top: 50%;
+                transform: translateY(-50%);
+            }
+
+            .bet-stack-text-bottom {
+                left: 50%;
+                top: 100%;
+                transform: translateX(-50%);
+                margin-top: 4px;
+            }
+
+            .poker-card {
+                /* Default (mobile/tablet) sizes - making these larger */
+                width: 22.5px;
+                height: 33.5px;
+                background-color: white;
+                border: 2px solid black;
+                border-radius: 4px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 20px;
+            }
+
+            @media (min-width: 630px) and (max-width: 830px) {
+                .poker-card {
+                    width: 30px;
+                    height: 45px;
+                    font-size: 20px;
+                }
+            }
+
+            @media (min-width: 830px) and (max-width: 1023px) {
+                .poker-card {
+                    width: 35px;
+                    height: 52px;
+                    font-size: 20px;
+                }
+            }
+
+            /* Smaller cards for narrow desktop windows */
+            @media (min-width: 1024px) and (max-width: 1399px) {
+                .poker-card {
+                    width: 40px;
+                    height: 60px;
+                    font-size: 20px;
+                }
+            }
+
+            /* Largest cards only for wide desktop screens */
+            @media (min-width: 1400px) {
+                .poker-card {
+                    width: 50px;
+                    height: 75px;
+                    font-size: 24px;
+                }
+            }
+
+            .board-cards {
+                display: flex;
+                gap: 3px;  /* Default gap */
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                z-index: 1;
+            }
+
+            @media (min-width: 1400px) {
+                .board-cards {
+                    gap: 4px;  /* Slightly larger gap for wide screens */
+                }
+            }
+
+
+            .game-table {
+                width: 100%;
+                padding: 20px;
+                min-height: 300px;
+                box-sizing: border-box;
+            }
+
+            .table-surface {
+                position: relative;
+                width: calc(100% - 40px);
+                padding-top: calc(60% - 40px);
+                background-color: #2B7A4B;
+                border-radius: 50%;
+                border: 20px solid #4A2511;
+                margin: auto;
+            }
+
+            /* Add responsive font sizes */
+            @media (max-width: 768px) {
+                .total-pot-display {
+                    font-size: 16px;
+                }
+                
+                .player-info-box {
+                    font-size: 10px;
+                    padding: 3px 6px;
+                }
+                
+                .bet-stack div {
+                    font-size: 12px;
+                }
+            }
+
+            /* Adjust player positions for different screen sizes */
+            @media (max-width: 480px) {
+                .player-info {
+                    min-width: 90px;
+                }
+                
+                .dealer-button {
+                    width: 25px;
+                    height: 25px;
+                    font-size: 14px;
+                }
+                
+                .chip {
+                    transform: scale(0.8);
+                }
+            }
+
+            .table-logo {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 260px;
+                height: auto;
+                opacity: 0.1;
+                pointer-events: none;
+                z-index: 0;
+                filter: brightness(0) invert(1);  /* This makes the logo white */
+            }
+
+            .table-content {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+            }
+
+            .total-pot-display {
+                position: absolute;
+                top: 37%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                text-align: center;
+                color: white;
+                font-size: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .prev-pot-display {
+                position: absolute;
+                top: 60%;
+                left: 38%;
+                transform: translate(-50%, -50%);
+                text-align: center;
+                color: white;
+                font-size: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 100;
+            }
+
+            .player-info {
+                position: absolute;
+                transform: translate(-50%, -50%);
+                text-align: center;
+                min-width: 120px;
+            }
+
+            .player-info-box {
+                color: white !important; 
+                font-size: 12px;
+                font-weight: bold;
+                line-height: 1.2;
+                padding: 4px 8px;
+                background-color: rgba(0,0,0,0.5);
+                border: 2px solid white;
+                border-radius: 4px;
+                white-space: nowrap;
+            }
+            
+            .poker-card-spades {
+                color: black;
+            }
+
+            .poker-card-hearts {
+                color: #ff0000;
+            }
+
+            .poker-card-diamonds {
+                color: #0000ff;
+            }
+
+            .poker-card-clubs {
+                color: #008000;
+            }
+
+            .player-claude {
+                color: rgba(180, 0, 0, 0.8);  /* Darkened red */
+            }
+
+            .player-gemini {
+                color: rgba(0, 100, 0, 0.8);  /* Darkened green */
+            }
+
+            .player-gpt {
+                color: rgba(0, 0, 0, 0.8);    /* Darkened black */
+            }
+
+            .player-grok {
+                color: rgba(0, 0, 180, 0.8);  /* Darkened blue */
+            }
+
+            .player-claude .player-info-box {
+                background-color: rgba(180, 0, 0, 0.8);  /* Darkened red */
+            }
+            
+            .player-gemini .player-info-box {
+                background-color: rgba(0, 100, 0, 0.8);  /* Darkened green */
+            }
+            
+            .player-gpt .player-info-box {
+                background-color: rgba(0, 0, 0, 0.8);    /* Darkened black */
+            }
+            
+            .player-grok .player-info-box {
+                background-color: rgba(0, 0, 180, 0.8);  /* Darkened blue */
+            }
+
+            .player-info-box-active {
+                border-color: #FFD700;
+            }
+
+            .player-cards {
+                position: absolute;
+                transform: translate(-50%, -50%);
+                display: flex;
+                gap: 4px;
+            }
+
+            .player-info-box-not-live, .player-cards-not-live {
+                opacity: 0.2;
+            }
+
+            .dealer-button {
+                position: absolute;
+                width: 35px;
+                height: 35px;
+                background-color: lightblue;
+                border: 2px solid black;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: bold;
+                font-size: 16px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                z-index: 300;
+            }
+
+            .player-bet {
+                position: absolute;
+                transform: translate(-50%, -50%);
+                z-index: 10;
+            }
+
+        </style>
+
+        <style>
+            .spinner-container {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 300px;
+            }
+
+            .spinner {
+                width: 50px;
+                height: 50px;
+                border: 5px solid #f3f3f3;
+                border-top: 5px solid #425B76;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+            }
+
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        </style>
    </head>
    <body>
        <div class="header">
-           <img src="logo.png" width="366" height="71" alt="Overbet.ai Logo">
+           <img src="https://overbet.ai/logo.png" width="366" height="71" alt="Overbet.ai Logo">
        </div>
 
        <div class="hero-section">
            <div class="main-content">
-               <h1>Texas Hold'LLM</h1>               
-               <div class="game-preview">
+               <h1>Texas Hold'LLM</h1>
+               <div class="layout">
+                    <div id="visualization-container"></div>
+                    <div id="debug-container"></div>
+                </div>
+               <!--<div class="game-preview">
                    <div class="bot-container">
                        <div class="robot-icon">
                            <i class="fas fa-solid fa-robot white-icon"></i>
@@ -261,12 +653,12 @@
                        </div>
                        <div class="bot-name">Gemini</div>
                    </div>
-               </div>
+               </div>-->
            </div>
        </div>
 
        <div class="signup-section">
-           <h2>Coming Soon: Spin up your own AI agent</h2>
+           <h2>Think you could do better?</h2>
            <!-- <p>Check out the prompts that we used here. Think you could do better? </p> -->
            <p>Sign up to get notified when we launch!</p>
            <!-- <div style="position: relative; width: 480px; height: 70px; overflow: hidden;">
@@ -312,5 +704,459 @@
        </div>
 
        <footer>© 2024 Overbet.ai</footer>
+
+       <script type="text/babel">
+        window.addEventListener('load', function() {
+            const { useState, useEffect } = React;
+
+            const PLAYER_NAMES = {
+                0: "Claude 3.5 Sonnet",
+                1: "Gemini 1.5-flash", 
+                2: "GPT-4o",
+                3: "Grok-beta"
+            };
+            const PLAYER_SHORT_NAMES = {
+                0: "Claude",
+                1: "Gemini", 
+                2: "GPT",
+                3: "Grok"
+            };
+            const PLAYER_CLASS = {
+                0: "player-claude",
+                1: "player-gemini", 
+                2: "player-gpt",
+                3: "player-grok"
+            };
+
+            // Utility Components
+            const Circle = ({ size, fill, color, strokeWidth, style }) => (
+                <div className="chip" style={{
+                    width: size + 'px',
+                    height: size + 'px',
+                    backgroundColor: fill,
+                    border: `${strokeWidth}px solid ${color}`,
+                    ...style
+                }} />
+            );
+
+            const CHIP_DENOMS = [
+                { value: 500, color: '#800080', label: '500' },
+                { value: 100, color: '#333333', label: '100' },
+                { value: 25, color: '#008000', label: '25' },
+                { value: 5, color: '#FF0000', label: '5' },
+                { value: 1, color: '#FFFFFF', label: '1' }
+            ];
+
+            const SingleChip = ({ color }) => (
+                <Circle
+                    size={24}
+                    fill={color}
+                    color={color === '#000000' ? 'black' : 'black'}
+                    strokeWidth={2}
+                />
+            );
+
+            const BetStack = ({ amount }) => {
+                if (amount === 0) return null;
+
+                let remaining = amount;
+                const chipStacks = [];
+                for (const denom of CHIP_DENOMS) {
+                    const count = Math.floor(remaining / denom.value);
+                    if (count > 0) {
+                        for (let i = 0; i < count; i++) {
+                            chipStacks.push(denom);
+                        }
+                        remaining -= count * denom.value;
+                    }
+                }
+
+                const stackHeight = (chipStacks.length - 1) * 6;  // Calculate total stack height
+
+                return (
+                    <div className="bet-stack">
+                        {chipStacks.map((chip, i) => (
+                            <div
+                                key={`${chip.value}-${i}`}
+                                style={{
+                                    position: 'absolute',
+                                    bottom: `${i * 6}px`,
+                                    left: '50%',
+                                    transform: 'translateX(-50%)',
+                                    zIndex: 100+i
+                                }}
+                            >
+                                <SingleChip color={chip.color} />
+                            </div>
+                        ))}
+                        <div style={{
+                            position: 'absolute',
+                            left: '50%',
+                            bottom: `${stackHeight+6}px`,
+                            transform: 'translateX(-50%)',
+                            color: 'white',
+                            fontSize: '14px',
+                            fontWeight: 'bold',
+                            whiteSpace: 'nowrap',
+                            zIndex: 200
+                        }}>
+                            ${amount}
+                        </div>
+                    </div>
+                );
+            };
+
+            const PokerCard = ({ card }) => {
+                if (!card) return null;
+                
+                const suitSymbols = {
+                    's': '♠',
+                    'h': '♥',
+                    'd': '♦',
+                    'c': '♣'
+                };
+                
+                const suitClasses = {
+                    's': 'poker-card-spades',
+                    'h': 'poker-card-hearts', 
+                    'd': 'poker-card-diamonds',
+                    'c': 'poker-card-clubs'
+                };
+                
+                return (
+                    <div className={`poker-card ${suitClasses[card.suit]}`}>
+                        {card.rank}{suitSymbols[card.suit]}
+                    </div>
+                );
+            };
+
+            const GameTable = ({ gameSetup, handInfo, gameState, cumulativePayoffs = [0, 0, 0, 0] }) => {
+                const calculatePlayerPositions = (numPlayers) => {
+                    return [...Array(numPlayers)].map((_, i) => {
+                        const angle = (i * 360 / numPlayers - 90) * (Math.PI / 180);
+                        const aOuter = 49;
+                        const bOuter = i === 0 || i === 2 ? 51 : 42;  // Increased vertical radius for top/bottom players
+                        const aInner = 32;
+                        const bInner = i === 0 || i === 2 ? 36 : 27;  // Increased vertical radius for cards
+                        
+                        let betOffset;
+                        if (i === 0) {      
+                            betOffset = { x: 0, y: 15 };
+                        } else if (i === 1) {
+                            betOffset = { x: -10, y: 0 };
+                        } else if (i === 2) {
+                            betOffset = { x: 0, y: -15 };
+                        } else {
+                            betOffset = { x: 10, y: 0 };
+                        }
+                        
+                        const cardPos = {
+                            left: 50 + aInner * Math.cos(angle),
+                            top: 50 + bInner * Math.sin(angle)
+                        };
+                        
+                        return {
+                            info: {
+                                left: `${50 + aOuter * Math.cos(angle)}%`,
+                                top: `${50 + bOuter * Math.sin(angle)}%`,
+                            },
+                            card: {
+                                left: `${cardPos.left}%`,
+                                top: `${cardPos.top}%`,
+                            },
+                            bet: {
+                                left: `${cardPos.left + betOffset.x}%`,
+                                top: `${cardPos.top + betOffset.y}%`,
+                            },
+                            betTextPos: i === 0 || i === 2 ? 'right' : 'bottom'
+                        };
+                    });
+                };
+
+                const positions = calculatePlayerPositions(handInfo.players);
+
+                const getDisplayedStack = (playerIndex) => {
+                    return handInfo.stacks[playerIndex];
+                };
+
+                const renderBoardCards = () => {
+                    if (!gameState.board) return null;
+
+                    return (
+                        <div className="board-cards">
+                            {gameState.board.map((streetCards, streetIndex) => (
+                                streetCards.map((card, cardIndex) => (
+                                    <div key={`${streetIndex}-${cardIndex}`} style={{ opacity: streetIndex >= gameState.street ? 0 : 1 }}>
+                                        <PokerCard card={card} />
+                                    </div>
+                                ))
+                            ))}
+                        </div>
+                    );
+                };
+
+                return (
+                    <div className="game-table">
+                        <div className="table-surface">
+                            <div className="table-content">
+                                <img src="https://overbet.ai/logo.png" className="table-logo" alt="Overbet AI Logo" />
+
+                                <div className="total-pot-display">
+                                    <span>Pot: ${gameState.pot}</span>
+                                </div>
+
+                                <div className="prev-pot-display">
+                                    <BetStack amount={gameState.prevStreetPot} textPosition="bottom" />
+                                </div>
+
+                                {renderBoardCards()}
+
+                                {positions.map((pos, i) => (
+                                    <React.Fragment key={i}>
+                                        <div className={`player-info ${PLAYER_CLASS[i]}`} style={{
+                                            left: pos.info.left,
+                                            top: pos.info.top,
+                                        }}>
+                                            <div className={`player-info-box ${gameState.player_to_act === i ? 'player-info-box-active' : ''} ${
+                                                    gameState.player_live ? (gameState.player_live[i] ? '' : 'player-info-box-not-live') : ''
+                                                }`}>
+                                                <div>{PLAYER_NAMES[i]}</div>
+                                                <div>${getDisplayedStack(i)} ({(cumulativePayoffs[i] || 0) >= 0 ? '+' : '-'}${Math.abs(cumulativePayoffs[i] || 0)} session)</div>
+                                                </div>
+                                            </div>
+
+                                            <div className={`player-cards ${
+                                                gameState.player_live ? (gameState.player_live[i] ? '' : 'player-cards-not-live') : ''
+                                            }`} style={{
+                                                left: pos.card.left,
+                                                top: pos.card.top,
+                                            }}>
+                                            {(gameState.hands[i] || []).map((card, cardIdx) => (
+                                                <PokerCard key={cardIdx} card={card} />
+                                            ))}
+                                        </div>
+
+                                        {handInfo.positions[0] === i && (
+                                            <div className="dealer-button" style={{
+                                                left: i === 0 || i === 2 
+                                                    ? `calc(${pos.info.left} - 95px)`  // Position to the left of info box
+                                                    : pos.info.left,                  // Center align with info box
+                                                top: i === 0 || i === 2
+                                                    ? pos.info.top                    // Same vertical alignment as info box
+                                                    : `calc(${pos.info.top} + 20px)`,  // Position below info box
+                                            }}>D</div>
+                                        )}
+
+                                        {gameState.current_bets[i] > 0 && (
+                                            <div className="player-bet" style={{
+                                                left: pos.bet.left,
+                                                top: pos.bet.top,
+                                            }}>
+                                                <BetStack 
+                                                    amount={gameState.current_bets[i]} 
+                                                    textPosition={pos.betTextPos}
+                                                />
+                                            </div>
+                                        )}
+                                    </React.Fragment>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            function GameVisualizer({ gameState, cumulativePayoffs }) {
+                if (!gameState) return null;
+
+                // Calculate pot (sum of all chips paid in previous rounds)
+                const totalPot = (gameState.chips_paid_previous_streets || []).reduce((sum, chips) => sum + chips, 0) +
+                                (gameState.chips_paid_this_street || []).reduce((sum, chips) => sum + chips, 0);
+
+                const prevStreetPot = (gameState.chips_paid_previous_streets || []).reduce((sum, chips) => sum + chips, 0);
+
+                // Calculate remaining chips for each player
+                const remainingChips = (gameState.starting_stack || []).map((stack, index) => {
+                    const paidPrevious = (gameState.chips_paid_previous_streets || [])[index] || 0;
+                    const paidThis = (gameState.chips_paid_this_street || [])[index] || 0;
+                    return stack - paidPrevious - paidThis;
+                });
+
+                const transformedState = {
+                    handInfo: {
+                        players: gameState.num_players || 4,
+                        stacks: gameState.winner_index !== undefined ? 
+                            gameState.starting_stack : 
+                            remainingChips,
+                        positions: [gameState.dealer_button],
+                        winner: gameState.winner_index
+                    },
+                    gameState: {
+                        pot: gameState.winner_index !== undefined ? 0 : totalPot,
+                        prevStreetPot: gameState.winner_index !== undefined ? 0 : prevStreetPot, // Hide prev street pot when showing winner
+                        current_bets: gameState.winner_index !== undefined ?
+                            gameState.starting_stack.map((_, i) => i === gameState.winner_index ? gameState.total_pot_won : 0) :
+                            gameState.chips_paid_this_street || [],
+                        hands: gameState.hands || [],
+                        board: (gameState.board || []),
+                        player_to_act: gameState.player_to_act,
+                        street: gameState.street || 0,
+                        round: ['preflop', 'flop', 'turn', 'river'][gameState.street || 0],
+                        potWon: gameState.winner_index !== undefined,
+                        player_live: gameState.player_live
+                    }
+                };
+
+                return (
+                    <div className="game-visualizer">
+                        <GameTable 
+                            gameSetup={{
+                                gameName: 'Poker',
+                                gameType: { type: 'standard' },
+                                rounds: ['preflop', 'flop', 'turn', 'river'],
+                                ante: 0
+                            }}
+                            handInfo={transformedState.handInfo}
+                            gameState={transformedState.gameState}
+                            cumulativePayoffs={cumulativePayoffs}
+                        />
+                    </div>
+                );
+            }
+            
+            function App() {
+                const [gameState, setGameState] = useState(null);
+                const [cumulativePayoffs, setCumulativePayoffs] = useState([0, 0, 0, 0]);
+                const [isConnected, setIsConnected] = useState(false);
+        
+                useEffect(() => {
+                    const socket = io('https://staff-dev1.poker.camp:8001');
+                    const debugContainer = document.getElementById('debug-container');
+                    const startButton = document.getElementById('startButton');
+
+                    function appendMessage(msg) {
+                        const msgElement = document.createElement('div');
+                        try {
+                            const parsedMsg = JSON.parse(msg);
+                            console.log(parsedMsg);
+                            if ('hands' in parsedMsg) {
+                                // Don't append anything
+                            } else if ('actor' in parsedMsg) {
+                                const verb = parsedMsg.action.verb.toLowerCase();
+                                const b = document.createElement('b');
+                                b.className = PLAYER_CLASS[parsedMsg.actor];
+                                b.textContent = PLAYER_SHORT_NAMES[parsedMsg.actor];
+                                msgElement.appendChild(b);
+                                msgElement.appendChild(document.createTextNode(` ${verb}s${parsedMsg.action.total ? ` to $${parsedMsg.action.total}` : ''}`));
+                            } else if ('payoffs' in parsedMsg) {
+                                msgElement.appendChild(document.createTextNode('\n'));
+                                // Sort players by payoff amount, descending
+                                const sortedPayoffs = parsedMsg.payoffs
+                                    .map((payoff, i) => ({payoff, index: i}))
+                                    .filter(p => p.payoff !== 0)
+                                    .sort((a, b) => b.payoff - a.payoff);
+                                
+                                sortedPayoffs.forEach(({payoff, index}) => {
+                                    const b = document.createElement('b');
+                                    b.className = PLAYER_CLASS[index];
+                                    b.textContent = PLAYER_SHORT_NAMES[index];
+                                    msgElement.appendChild(b);
+                                    msgElement.appendChild(document.createTextNode(`: ${payoff > 0 ? '+$' : '-$'}${Math.abs(payoff)}\n`));
+                                });
+                                msgElement.appendChild(document.createTextNode('\n'));
+                            } else {
+                                // msgElement.textContent = JSON.stringify(parsedMsg);
+                            }
+                            // Only update game state if the message contains hands data
+                            if ('hands' in parsedMsg) {
+                                // sample game state data:
+                                // {"player_to_act": 1, "action_history": [[2, {"verb": "Raise", "total": 30}], [3, {"verb": "Fold"}], [0, {"verb": "Call"}], [1, {"verb": "Call"}], [0, {"verb": "Check"}]], "action_history_by_street": [[[2, {"verb": "Raise", "total": 30}], [3, {"verb": "Fold"}], [0, {"verb": "Call"}], [1, {"verb": "Call"}]], [[0, {"verb": "Check"}]], [], []], "hands": [[{"rank": "4", "suit": "c"}, {"rank": "A", "suit": "c"}], [{"rank": "A", "suit": "s"}, {"rank": "2", "suit": "d"}], [{"rank": "Q", "suit": "s"}, {"rank": "9", "suit": "s"}], [{"rank": "9", "suit": "h"}, {"rank": "5", "suit": "c"}]], "board": [[{"rank": "7", "suit": "h"}, {"rank": "K", "suit": "h"}, {"rank": "8", "suit": "h"}], [{"rank": "3", "suit": "c"}], [{"rank": "J", "suit": "h"}]], "street": 1, "chips_paid_this_street": [0, 0, 0, 0], "chips_paid_previous_streets": [30, 30, 30, 0], "player_live": [true, true, true, false], "player_action_option": [false, true, true, false], "starting_stack": [1000, 1000, 1000, 1000]}
+                                setGameState(parsedMsg);
+                            } else if ('payoffs' in parsedMsg) {
+                                // Update game state with payoff information
+                                setGameState(prevState => {
+                                    if (!prevState) return null;
+                                    
+                                    const winnerIndex = parsedMsg.payoffs.findIndex(p => p > 0);
+                                    const totalPot = (prevState.chips_paid_previous_streets || []).reduce((sum, chips) => sum + chips, 0) +
+                                                (prevState.chips_paid_this_street || []).reduce((sum, chips) => sum + chips, 0);
+                                    
+                                    return {
+                                        ...prevState,
+                                        winner_index: winnerIndex,
+                                        total_pot_won: totalPot,
+                                        starting_stack: prevState.starting_stack.map((stack, i) => 
+                                            i === winnerIndex ? stack + parsedMsg.payoffs[i] : stack + (parsedMsg.payoffs[i] || 0)
+                                        )
+                                    };
+                                });
+                                setCumulativePayoffs(prev => {
+                                    const newPayoffs = prev.map((payoff, i) => payoff + (parsedMsg.payoffs[i] || 0));
+                                    console.log('Updated cumulative payoffs:', newPayoffs);  // Add logging
+                                    return newPayoffs;
+                                });
+                            }
+                        } catch (e) {
+                            console.log(msg);
+                            msgElement.style.opacity = "0.3";
+                            msgElement.textContent = msg;
+                        }
+                        debugContainer.appendChild(msgElement);
+                        debugContainer.scrollTop = debugContainer.scrollHeight;
+                    }
+
+                    socket.on('connect', () => {
+                        setIsConnected(true);
+                        appendMessage('Connected to server');
+                        socket.emit('create_and_spectate_match_v0', {
+                            action_throttle: 3.2,
+                            num_rounds: 0
+                        });
+                    });
+
+                    socket.on('game_message', (msg) => {
+                        appendMessage(msg);
+                    });
+
+                    socket.on('spectate_success', (msg) => {
+                        appendMessage(msg);
+                        setCumulativePayoffs([0, 0, 0, 0]);
+                    });
+
+                    socket.on('spectate_error', (msg) => {
+                        appendMessage('Error: ' + msg);
+                    });
+
+                    socket.on('create_match_error', (msg) => {
+                        appendMessage('Error creating match: ' + msg);
+                    });
+
+                    socket.on('match_ended', () => {
+                        appendMessage('Match ended');
+                        // setGameState(null);
+                    });
+
+                    return () => socket.disconnect();
+                }, []);
+
+                return (
+                    <React.Fragment>
+                        {(!isConnected || !gameState) ? (
+                            <div className="spinner-container">
+                                <div className="spinner"></div>
+                            </div>
+                        ) : (
+                            <GameVisualizer 
+                                gameState={gameState} 
+                                cumulativePayoffs={cumulativePayoffs}
+                            />
+                        )}
+                    </React.Fragment>
+                );
+            }
+            
+            ReactDOM.render(<App />, document.getElementById('visualization-container'));
+        });
+        </script>
    </body>
 </html>
