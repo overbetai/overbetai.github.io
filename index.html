@@ -1108,23 +1108,22 @@
                     socket.on('connect', () => {
                         setIsConnected(true);
                         appendMessage('Connected to server');
-                        socket.emit('create_and_spectate_match_v0', {
-                            action_throttle: 3.2,
-                            num_rounds: 0
+                        socket.emit('request_spectate_match', {
+                            version: "0.1.0",
+                            params: {
+                                game_type: "holdllm",
+                                variant: 0
+                            }
                         });
+                    });
+
+                    socket.on('available_spectate_match', (data) => {
+                        appendMessage('Connected to spectator room: ' + data.room);
+                        setCumulativePayoffs([0, 0, 0, 0]);
                     });
 
                     socket.on('game_message', (msg) => {
                         appendMessage(msg);
-                    });
-
-                    socket.on('spectate_success', (msg) => {
-                        appendMessage(msg);
-                        setCumulativePayoffs([0, 0, 0, 0]);
-                    });
-
-                    socket.on('spectate_error', (msg) => {
-                        appendMessage('Error: ' + msg);
                     });
 
                     socket.on('create_match_error', (msg) => {
