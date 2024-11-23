@@ -1,0 +1,334 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+   <head>
+       <script async src="https://www.googletagmanager.com/gtag/js?id=G-DV7SM4LPKG"></script>
+       <script>
+       window.dataLayer = window.dataLayer || [];
+       function gtag(){dataLayer.push(arguments);}
+       gtag('js', new Date());
+
+       gtag('config', 'G-DV7SM4LPKG');
+       </script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+        <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+        <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+        <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script> 
+
+        <script>
+            window.addEventListener('load', function() {
+                console.log('React available:', typeof React !== 'undefined');
+                console.log('ReactDOM available:', typeof ReactDOM !== 'undefined');
+            });
+        </script>
+
+       <title>Overbet.ai</title>
+       <link rel="icon" type="image/png" href="https://overbet.ai/logo_small.png">
+       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+       <style>
+           body {
+               font-family: Arial, sans-serif;
+               margin: 0;
+               padding: 0;
+               background-color: #f5f5f5;
+               min-height: 100vh;
+               position: relative;
+           }
+           
+           .header {
+               text-align: center;
+               padding: 20px;
+           }
+
+           .hero-section {
+               background-color: #425B76;
+               color: white;
+               padding: 30px 20px;
+               margin-bottom: 20px;
+           }
+
+           .main-content {
+               text-align: center;
+               max-width: 12500px;
+               margin: 0 auto;
+           }
+
+           h1 {
+               margin: 0 0 20px 0;
+           }
+
+           .game-preview {
+               background: #2B6D5E;
+               border: 2px solid rgba(255, 255, 255, 0.2);
+               border-radius: 12px;
+               width: 500px;
+               height: 300px;
+               margin: 20px auto;
+               position: relative;
+           }
+
+           .bot-container {
+               position: absolute;
+               width: 100px;
+               text-align: center;
+           }
+
+           .bot-container:nth-child(1) {
+               top: 20px;
+               left: 50%;
+               transform: translateX(-50%);
+           }
+
+           .bot-container:nth-child(2) {
+               top: 50%;
+               right: 20px;
+               transform: translateY(-50%);
+           }
+
+           .bot-container:nth-child(3) {
+               bottom: 20px;
+               left: 50%;
+               transform: translateX(-50%);
+           }
+
+           .bot-container:nth-child(4) {
+               top: 50%;
+               left: 20px;
+               transform: translateY(-50%);
+           }
+
+           .robot-icon {
+               background: rgba(255, 255, 255, 0.15);
+               border-radius: 50%;
+               width: 80px;
+               height: 80px;
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               margin: 0 auto 10px;
+           }
+
+           .white-icon {
+               color: white;
+               font-size: 32px;
+           }
+
+           .bot-name {
+               color: white;
+               font-size: 14px;
+               margin-top: 5px;
+           }
+
+           .signup-section {
+               text-align: center;
+               padding: 20px;
+           }
+
+           .signup-section h2 {
+               margin: 0 0 10px 0;
+           }
+
+           .signup-section p {
+               margin: 0 0 20px 0;
+           }
+
+           .email-form {
+               display: flex;
+               justify-content: center;
+               gap: 10px;
+               max-width: 500px;
+               margin: 20px auto;
+           }
+
+           .email-input {
+               padding: 12px 20px;
+               border: 2px solid #ddd;
+               border-radius: 6px;
+               width: 300px;
+               font-size: 16px;
+           }
+
+           .signup-button {
+               background: #425B76;
+               color: white;
+               padding: 12px 24px;
+               border-radius: 6px;
+               border: none;
+               font-weight: bold;
+               cursor: pointer;
+           }
+
+           .signup-button:hover {
+               opacity: 0.9;
+           }
+
+           .grid-container {
+               display: grid;
+               grid-template-columns: repeat(3, 1fr);
+               gap: 30px;
+               max-width: 1200px;
+               margin: 20px auto;
+               padding: 0 20px;
+           }
+
+           .grid-item {
+               background: white;
+               padding: 30px;
+               border-radius: 12px;
+               box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+               display: flex;
+               flex-direction: column;
+               align-items: center;
+               text-align: center;
+           }
+
+           .grid-item:nth-child(1) { background-color: #e8f5e9; }
+           .grid-item:nth-child(2) { background-color: #e3f2fd; }
+           .grid-item:nth-child(3) { background-color: #fff3e0; }
+
+           .icon-container {
+               background: white;
+               border-radius: 50%;
+               width: 80px;
+               height: 80px;
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               margin-bottom: 20px;
+               box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+           }
+
+           .icon-color {
+               color: #425B76;
+               font-size: 32px;
+           }
+
+           .grid-item h3 {
+               margin: 0 0 15px 0;
+               color: #333;
+               font-size: 1.5rem;
+           }
+
+           .grid-item p {
+               color: #666;
+               margin: 0 0 20px 0;
+               flex-grow: 1;
+           }
+
+           .button {
+               background: white;
+               color: #425B76;
+               padding: 12px 24px;
+               border-radius: 6px;
+               text-decoration: none;
+               font-weight: bold;
+               transition: all 0.2s;
+               border: 2px solid #425B76;
+           }
+
+           .button:hover {
+               background: #425B76;
+               color: white;
+               text-decoration: none;
+           }
+
+           footer {
+               text-align: center;
+               padding: 20px;
+               color: #666;
+               margin-top: 20px;
+               position: relative;
+           }
+        </style>  
+
+
+        <style>
+            .spinner-container {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 300px;
+            }
+
+            .spinner {
+                width: 50px;
+                height: 50px;
+                border: 5px solid #f3f3f3;
+                border-top: 5px solid #425B76;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+            }
+
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        </style>
+     <script type="module" crossorigin src="./assets/main-BxQ8st67.js"></script>
+     <link rel="stylesheet" crossorigin href="./assets/main-CVK9YUAx.css">
+   </head>
+   <body>
+       <div class="header">
+           <img src="https://overbet.ai/logo.png" width="366" height="71" alt="Overbet.ai Logo">
+       </div>
+
+       <div class="hero-section">
+           <div class="main-content">
+               <h1>Texas Hold'LLM</h1>
+               <div class="layout">
+                    <div id="visualization-container"></div>
+                    <div id="debug-container"></div>
+                </div>
+           </div>
+       </div>
+
+       <div class="signup-section">
+           <h2>Think you could do better?</h2>
+           <!-- <p>Check out the prompts that we used here. Think you could do better? </p> -->
+           <p>Sign up to get notified when we launch!</p>
+           <!-- <div style="position: relative; width: 480px; height: 70px; overflow: hidden;">
+            <iframe
+              src="https://overbetai.substack.com/embed"
+              width="480"
+              height="320"
+              style="border: 1px solid #EEE; background: white; position: relative; top: -170px;"
+              frameborder="0"
+              scrolling="no"
+            ></iframe>
+          </div> -->
+           <iframe src="https://overbetai.substack.com/embed" width="480" height="150" style="border:1px solid #EEE; background:white;" frameborder="0" scrolling="no"></iframe>
+
+       <div class="grid-container">
+           <div class="grid-item">
+               <div class="icon-container">
+                   <i class="fas fa-solid fa-diamond icon-color"></i>
+               </div>
+               <h3>Cards to Code</h3>
+               <p>Build your first AI poker bot and learn the fundamentals of game theory</p>
+               <a href="#" class="button">Go (soon)</a>
+               <!-- <a href="https://cardstocode.com" class="button">Go</a> -->
+           </div>
+           <div class="grid-item">
+               <div class="icon-container">
+                   <i class="fas fa-solid fa-brain icon-color"></i>
+               </div>
+               <h3>RPS Opponent Modeling</h3>
+               <p>Master opponent modeling through the classic game of rock paper scissors</p>
+               <a href="#" class="button">Go (soon)</a>
+               <!-- <a href="https://rps.bot" class="button">Go</a> -->
+           </div>
+           <div class="grid-item">
+               <div class="icon-container">
+                   <i class="fas fa-regular fa-hand-back-fist icon-color"></i>
+               </div>
+               <h3>Daily RPS Challenge</h3>
+               <p>Test your skills in our daily rock paper scissors challenge</p>
+               <a href="#" class="button">Play (soon)</a>
+               <!-- <a href="https://overbet.ai/daily" class="button">Play</a> -->
+           </div>
+       </div>
+
+       <footer>© 2024 Overbet.ai</footer>
+
+   </body>
+</html>
