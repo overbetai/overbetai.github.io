@@ -5,7 +5,6 @@ import { GameTable } from './GameTable';
 import { TextCard } from './common/TextCard';
 import { PLAYER_CLASS, PLAYER_SHORT_NAMES } from './common/constants';
 
-
 export function App() {
     const [gameState, setGameState] = useState(null);
     const [payoffs, setPayoffs] = useState(undefined);
@@ -22,34 +21,64 @@ export function App() {
                 console.log(parsedMsg);
 
                 if ('hands' in parsedMsg) {
-                    // Check if this is a new street with no actions yet
-                    if (parsedMsg.action_history_by_street[parsedMsg.street].length === 0) {
-                        const streetNames = ['Preflop', 'Flop', 'Turn', 'River'];
-                        const streetCards = parsedMsg.board[parsedMsg.street - 1] || [];
-                        
-                        if (parsedMsg.street > 0) { // Don't show for preflop
-                            msgElement.appendChild(document.createTextNode(`\n`));
+                    // Show hole cards when new hand starts
+                    if (parsedMsg.street === 0 && parsedMsg.action_history_by_street[0].length === 0) {
+                        const headerElement = document.createElement('div');
+                        headerElement.appendChild(document.createTextNode('\n*** HOLE CARDS ***\n'));
+                        debugContainer.appendChild(headerElement);
+
+                        // Show each player's cards from left of dealer
+                        parsedMsg.hands.forEach((hand, i) => {
+                            const playerElement = document.createElement('div');
                             const b = document.createElement('b');
-                            b.style.color = '#444444';
-                            b.textContent = `${streetNames[parsedMsg.street]}:`;
-                            msgElement.appendChild(b);
-                            
-                            // Render each card using React
+                            b.className = PLAYER_CLASS[i];
+                            b.textContent = PLAYER_SHORT_NAMES[i] + ': ';
+                            playerElement.appendChild(b);
+
                             const cardContainer = document.createElement('span');
-                            cardContainer.style.marginLeft = '0.3em';
                             const root = ReactDOM.createRoot(cardContainer);
                             root.render(
                                 <React.Fragment>
-                                    {streetCards.map((card, i) => (
-                                        <React.Fragment key={i}>
-                                            {i == 0 ? '' : ' '}
+                                    {hand.map((card, j) => (
+                                        <React.Fragment key={j}>
+                                            {j === 0 ? '' : ' '}
                                             <TextCard card={card} />
                                         </React.Fragment>
                                     ))}
                                 </React.Fragment>
                             );
-                            msgElement.appendChild(cardContainer);
-                        }
+                            playerElement.appendChild(cardContainer);
+                            debugContainer.appendChild(playerElement);
+                        });
+
+                        // Add PREFLOP header after showing hole cards
+                        const preflopHeader = document.createElement('div');
+                        preflopHeader.appendChild(document.createTextNode('\n*** PREFLOP ***\n'));
+                        debugContainer.appendChild(preflopHeader);
+                    }
+
+                    // Check if this is a new street with no actions yet
+                    if (parsedMsg.street > 0 && parsedMsg.action_history_by_street[parsedMsg.street].length === 0) {
+                        const streetNames = ['PREFLOP', 'FLOP', 'TURN', 'RIVER'];
+                        const streetCards = parsedMsg.board[parsedMsg.street - 1] || [];
+                        
+                        msgElement.appendChild(document.createTextNode(`\n*** ${streetNames[parsedMsg.street]} *** [`));
+                        
+                        // Render each card using React
+                        const cardContainer = document.createElement('span');
+                        const root = ReactDOM.createRoot(cardContainer);
+                        root.render(
+                            <React.Fragment>
+                                {streetCards.map((card, i) => (
+                                    <React.Fragment key={i}>
+                                        {i === 0 ? '' : ' '}
+                                        <TextCard card={card} />
+                                    </React.Fragment>
+                                ))}
+                            </React.Fragment>
+                        );
+                        msgElement.appendChild(cardContainer);
+                        msgElement.appendChild(document.createTextNode(']\n'));
                     }
                 } else if ('actor' in parsedMsg) {
                     const verb = parsedMsg.action.verb.toLowerCase();
@@ -75,15 +104,11 @@ export function App() {
                     });
                     msgElement.appendChild(document.createTextNode('\n'));
                 }
-                // Only update game state if the message contains hands data
+
                 if ('hands' in parsedMsg) {
-                    // sample game state data:
-                    // {"player_to_act": 1, "action_history": [[2, {"verb": "Raise", "total": 30}], [3, {"verb": "Fold"}], [0, {"verb": "Call"}], [1, {"verb": "Call"}], [0, {"verb": "Check"}]], "action_history_by_street": [[[2, {"verb": "Raise", "total": 30}], [3, {"verb": "Fold"}], [0, {"verb": "Call"}], [1, {"verb": "Call"}]], [[0, {"verb": "Check"}]], [], []], "hands": [[{"rank": "4", "suit": "c"}, {"rank": "A", "suit": "c"}], [{"rank": "A", "suit": "s"}, {"rank": "2", "suit": "d"}], [{"rank": "Q", "suit": "s"}, {"rank": "9", "suit": "s"}], [{"rank": "9", "suit": "h"}, {"rank": "5", "suit": "c"}]], "board": [[{"rank": "7", "suit": "h"}, {"rank": "K", "suit": "h"}, {"rank": "8", "suit": "h"}], [{"rank": "3", "suit": "c"}], [{"rank": "J", "suit": "h"}]], "street": 1, "chips_paid_this_street": [0, 0, 0, 0], "chips_paid_previous_streets": [30, 30, 30, 0], "player_live": [true, true, true, false], "player_action_option": [false, true, true, false], "starting_stack": [1000, 1000, 1000, 1000]}
                     setPayoffs(undefined);
                     setGameState(parsedMsg);
                 } else if ('payoffs' in parsedMsg) {
-                    // Update game state with payoff information
-                    
                     setPayoffs(parsedMsg.payoffs);
                     setCumulativePayoffs(prev => 
                         prev.map((payoff, i) => payoff + (parsedMsg.payoffs[i] || 0))
