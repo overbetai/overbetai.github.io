@@ -15,10 +15,6 @@ export function App() {
         const debugContainer = document.getElementById('debug-container');
 
         function getPositions(dealerIndex) {
-            // BTN is at dealerIndex
-            // SB is next after BTN
-            // BB is next after SB
-            // CO is before BTN
             return {
                 btnIndex: dealerIndex,
                 sbIndex: (dealerIndex + 1) % 4,
@@ -29,17 +25,11 @@ export function App() {
 
         function formatAction(verb, total) {
             const v = verb.toLowerCase();
-            if (v === 'bet') {
-                return `bets $${total}`;
-            } else if (v === 'raise') {
-                return `raises to $${total}`;
-            } else if (v === 'fold') {
-                return 'folds';
-            } else if (v === 'call') {
-                return 'calls';
-            } else if (v === 'check') {
-                return 'checks';
-            }
+            if (v === 'bet') return `bets $${total}`;
+            if (v === 'raise') return `raises to $${total}`;
+            if (v === 'fold') return 'folds';
+            if (v === 'call') return 'calls';
+            if (v === 'check') return 'checks';
             return v + (total ? ` $${total}` : '');
         }
 
@@ -56,17 +46,16 @@ export function App() {
                         const headerElement = document.createElement('div');
                         headerElement.appendChild(document.createTextNode('\n*** HOLE CARDS ***\n'));
                         debugContainer.appendChild(headerElement);
-                        
-                        // Show cards in order: SB, BB, CO, BTN
+
                         [positions.sbIndex, positions.bbIndex, positions.coIndex, positions.btnIndex].forEach(i => {
                             if (!parsedMsg.hands[i]) return;
-                            
+
                             const playerElement = document.createElement('div');
                             const b = document.createElement('b');
                             b.className = PLAYER_CLASS[i];
                             const position = i === positions.sbIndex ? 'SB' :
-                                           i === positions.bbIndex ? 'BB' :
-                                           i === positions.coIndex ? 'CO' : 'BTN';
+                                i === positions.bbIndex ? 'BB' :
+                                    i === positions.coIndex ? 'CO' : 'BTN';
                             b.textContent = `${PLAYER_SHORT_NAMES[i]} (${position}): `;
                             playerElement.appendChild(b);
 
@@ -88,12 +77,10 @@ export function App() {
                             debugContainer.appendChild(playerElement);
                         });
 
-                        // Add PREFLOP header
                         const preflopHeader = document.createElement('div');
                         preflopHeader.appendChild(document.createTextNode('\n*** PREFLOP ***\n'));
                         debugContainer.appendChild(preflopHeader);
-                        
-                        // Add small blind post
+
                         const sbPost = document.createElement('div');
                         const sbName = document.createElement('b');
                         sbName.className = PLAYER_CLASS[positions.sbIndex];
@@ -101,8 +88,7 @@ export function App() {
                         sbPost.appendChild(sbName);
                         sbPost.appendChild(document.createTextNode(' posts small blind $5'));
                         debugContainer.appendChild(sbPost);
-                        
-                        // Add big blind post
+
                         const bbPost = document.createElement('div');
                         const bbName = document.createElement('b');
                         bbName.className = PLAYER_CLASS[positions.bbIndex];
@@ -112,13 +98,12 @@ export function App() {
                         debugContainer.appendChild(bbPost);
                     }
 
-                    // Handle new street display
                     if (parsedMsg.street > 0 && parsedMsg.action_history_by_street[parsedMsg.street].length === 0) {
                         const streetNames = ['PREFLOP', 'FLOP', 'TURN', 'RIVER'];
                         const streetCards = parsedMsg.board[parsedMsg.street - 1] || [];
-                        
+
                         msgElement.appendChild(document.createTextNode(`\n*** ${streetNames[parsedMsg.street]} *** [`));
-                        
+
                         const cardContainer = document.createElement('span');
                         const root = ReactDOM.createRoot(cardContainer);
                         root.render(
@@ -143,11 +128,11 @@ export function App() {
                 } else if ('payoffs' in parsedMsg) {
                     msgElement.appendChild(document.createTextNode('\n*** RESULTS ***\n'));
                     const sortedPayoffs = parsedMsg.payoffs
-                        .map((payoff, i) => ({payoff, index: i}))
+                        .map((payoff, i) => ({ payoff, index: i }))
                         .filter(p => p.payoff !== 0)
                         .sort((a, b) => b.payoff - a.payoff);
-                    
-                    sortedPayoffs.forEach(({payoff, index}) => {
+
+                    sortedPayoffs.forEach(({ payoff, index }) => {
                         const b = document.createElement('b');
                         b.className = PLAYER_CLASS[index];
                         b.textContent = PLAYER_SHORT_NAMES[index];
@@ -162,7 +147,7 @@ export function App() {
                     setGameState(parsedMsg);
                 } else if ('payoffs' in parsedMsg) {
                     setPayoffs(parsedMsg.payoffs);
-                    setCumulativePayoffs(prev => 
+                    setCumulativePayoffs(prev =>
                         prev.map((payoff, i) => payoff + (parsedMsg.payoffs[i] || 0))
                     );
                 }
@@ -171,10 +156,20 @@ export function App() {
                 msgElement.style.opacity = "0.3";
                 msgElement.textContent = msg;
             }
+
+            const isAtBottom =
+                debugContainer.scrollHeight - debugContainer.scrollTop <=
+                debugContainer.clientHeight + 150;
+
             debugContainer.appendChild(msgElement);
-            debugContainer.scrollTop = debugContainer.scrollHeight;
+
+            requestAnimationFrame(() => {
+                if (isAtBottom) {
+                    debugContainer.scrollTop = debugContainer.scrollHeight;
+                }
+            });
         }
-        
+
         socket.on('connect', () => {
             appendMessage('Connected to server');
             socket.emit('request_spectate_match', {
@@ -186,7 +181,7 @@ export function App() {
             });
         });
 
-        socket.on('available_spectate_match', (data) => {
+        socket.on('available_spectate_match', () => {
             appendMessage('Connected to spectator room');
             setCumulativePayoffs([0, 0, 0, 0]);
         });
