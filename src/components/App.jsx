@@ -14,6 +14,35 @@ export function App() {
         const socket = io('https://staff-dev1.poker.camp:8001');
         const debugContainer = document.getElementById('debug-container');
 
+        function getPositions(dealerIndex) {
+            // BTN is at dealerIndex
+            // SB is next after BTN
+            // BB is next after SB
+            // CO is before BTN
+            return {
+                btnIndex: dealerIndex,
+                sbIndex: (dealerIndex + 1) % 4,
+                bbIndex: (dealerIndex + 2) % 4,
+                coIndex: (dealerIndex + 3) % 4
+            };
+        }
+
+        function formatAction(verb, total) {
+            const v = verb.toLowerCase();
+            if (v === 'bet') {
+                return `bets $${total}`;
+            } else if (v === 'raise') {
+                return `raises to $${total}`;
+            } else if (v === 'fold') {
+                return 'folds';
+            } else if (v === 'call') {
+                return 'calls';
+            } else if (v === 'check') {
+                return 'checks';
+            }
+            return v + (total ? ` $${total}` : '');
+        }
+
         function appendMessage(msg) {
             const msgElement = document.createElement('div');
             try {
@@ -21,50 +50,75 @@ export function App() {
                 console.log(parsedMsg);
 
                 if ('hands' in parsedMsg) {
-                    // Show hole cards when new hand starts
                     if (parsedMsg.street === 0 && parsedMsg.action_history_by_street[0].length === 0) {
+                        const positions = getPositions(parsedMsg.dealer_button);
+
                         const headerElement = document.createElement('div');
                         headerElement.appendChild(document.createTextNode('\n*** HOLE CARDS ***\n'));
                         debugContainer.appendChild(headerElement);
-
-                        // Show each player's cards from left of dealer
-                        parsedMsg.hands.forEach((hand, i) => {
+                        
+                        // Show cards in order: SB, BB, CO, BTN
+                        [positions.sbIndex, positions.bbIndex, positions.coIndex, positions.btnIndex].forEach(i => {
+                            if (!parsedMsg.hands[i]) return;
+                            
                             const playerElement = document.createElement('div');
                             const b = document.createElement('b');
                             b.className = PLAYER_CLASS[i];
-                            b.textContent = PLAYER_SHORT_NAMES[i] + ': ';
+                            const position = i === positions.sbIndex ? 'SB' :
+                                           i === positions.bbIndex ? 'BB' :
+                                           i === positions.coIndex ? 'CO' : 'BTN';
+                            b.textContent = `${PLAYER_SHORT_NAMES[i]} (${position}): `;
                             playerElement.appendChild(b);
 
                             const cardContainer = document.createElement('span');
                             const root = ReactDOM.createRoot(cardContainer);
                             root.render(
                                 <React.Fragment>
-                                    {hand.map((card, j) => (
+                                    {'['}
+                                    {parsedMsg.hands[i].map((card, j) => (
                                         <React.Fragment key={j}>
                                             {j === 0 ? '' : ' '}
                                             <TextCard card={card} />
                                         </React.Fragment>
                                     ))}
+                                    {']'}
                                 </React.Fragment>
                             );
                             playerElement.appendChild(cardContainer);
                             debugContainer.appendChild(playerElement);
                         });
 
-                        // Add PREFLOP header after showing hole cards
+                        // Add PREFLOP header
                         const preflopHeader = document.createElement('div');
                         preflopHeader.appendChild(document.createTextNode('\n*** PREFLOP ***\n'));
                         debugContainer.appendChild(preflopHeader);
+                        
+                        // Add small blind post
+                        const sbPost = document.createElement('div');
+                        const sbName = document.createElement('b');
+                        sbName.className = PLAYER_CLASS[positions.sbIndex];
+                        sbName.textContent = PLAYER_SHORT_NAMES[positions.sbIndex];
+                        sbPost.appendChild(sbName);
+                        sbPost.appendChild(document.createTextNode(' posts small blind $5'));
+                        debugContainer.appendChild(sbPost);
+                        
+                        // Add big blind post
+                        const bbPost = document.createElement('div');
+                        const bbName = document.createElement('b');
+                        bbName.className = PLAYER_CLASS[positions.bbIndex];
+                        bbName.textContent = PLAYER_SHORT_NAMES[positions.bbIndex];
+                        bbPost.appendChild(bbName);
+                        bbPost.appendChild(document.createTextNode(' posts big blind $10'));
+                        debugContainer.appendChild(bbPost);
                     }
 
-                    // Check if this is a new street with no actions yet
+                    // Handle new street display
                     if (parsedMsg.street > 0 && parsedMsg.action_history_by_street[parsedMsg.street].length === 0) {
                         const streetNames = ['PREFLOP', 'FLOP', 'TURN', 'RIVER'];
                         const streetCards = parsedMsg.board[parsedMsg.street - 1] || [];
                         
                         msgElement.appendChild(document.createTextNode(`\n*** ${streetNames[parsedMsg.street]} *** [`));
                         
-                        // Render each card using React
                         const cardContainer = document.createElement('span');
                         const root = ReactDOM.createRoot(cardContainer);
                         root.render(
@@ -81,15 +135,13 @@ export function App() {
                         msgElement.appendChild(document.createTextNode(']\n'));
                     }
                 } else if ('actor' in parsedMsg) {
-                    const verb = parsedMsg.action.verb.toLowerCase();
                     const b = document.createElement('b');
                     b.className = PLAYER_CLASS[parsedMsg.actor];
                     b.textContent = PLAYER_SHORT_NAMES[parsedMsg.actor];
                     msgElement.appendChild(b);
-                    msgElement.appendChild(document.createTextNode(` ${verb}s${parsedMsg.action.total ? ` to $${parsedMsg.action.total}` : ''}`));
+                    msgElement.appendChild(document.createTextNode(` ${formatAction(parsedMsg.action.verb, parsedMsg.action.total)}`));
                 } else if ('payoffs' in parsedMsg) {
-                    msgElement.appendChild(document.createTextNode('\n'));
-                    // Sort players by payoff amount, descending
+                    msgElement.appendChild(document.createTextNode('\n*** RESULTS ***\n'));
                     const sortedPayoffs = parsedMsg.payoffs
                         .map((payoff, i) => ({payoff, index: i}))
                         .filter(p => p.payoff !== 0)
