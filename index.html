@@ -10,19 +10,7 @@
        gtag('config', 'G-DV7SM4LPKG');
        </script>
 
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
-        <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-        <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-        <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script> 
-
-        <script>
-            window.addEventListener('load', function() {
-                console.log('React available:', typeof React !== 'undefined');
-                console.log('ReactDOM available:', typeof ReactDOM !== 'undefined');
-            });
-        </script>
-
-       <title>Overbet.ai</title>
+       <title>Overbet.ai - AI and Game Strategy</title>
        <link rel="icon" type="image/png" href="https://overbet.ai/logo_small.png">
        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
        <style>
@@ -38,142 +26,104 @@
            .header {
                text-align: center;
                padding: 20px;
+               background: white;
            }
 
            .hero-section {
                background-color: #425B76;
                color: white;
-               padding: 30px 20px;
-               margin-bottom: 20px;
+               padding: 40px 20px;
            }
 
            .main-content {
                text-align: center;
-               max-width: 12500px;
+               max-width: 1200px;
                margin: 0 auto;
+               padding-bottom: 0px;
            }
 
            h1 {
                margin: 0 0 20px 0;
            }
 
-           .game-preview {
-               background: #2B6D5E;
-               border: 2px solid rgba(255, 255, 255, 0.2);
+           .game-screenshot {
+               max-width: 800px;
+               width: 100%;
+               height: auto;
+               margin: 0 auto 30px;
+               border-radius: 8px;
+               box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+               display: block;
+               transition: transform 0.2s;
+           }
+
+           .game-screenshot:hover {
+               transform: scale(1.02);
+           }
+
+           .featured-project {
+               background: rgba(255, 255, 255, 0.1);
                border-radius: 12px;
-               width: 500px;
-               height: 300px;
-               margin: 20px auto;
-               position: relative;
+               padding: 30px;
+               margin: 30px auto;
+               max-width: 740px;
            }
 
-           .bot-container {
-               position: absolute;
-               width: 100px;
-               text-align: center;
+           .featured-project:last-child {
+               margin-bottom: 0;
            }
 
-           .bot-container:nth-child(1) {
-               top: 20px;
-               left: 50%;
-               transform: translateX(-50%);
-           }
-
-           .bot-container:nth-child(2) {
-               top: 50%;
-               right: 20px;
-               transform: translateY(-50%);
-           }
-
-           .bot-container:nth-child(3) {
-               bottom: 20px;
-               left: 50%;
-               transform: translateX(-50%);
-           }
-
-           .bot-container:nth-child(4) {
-               top: 50%;
-               left: 20px;
-               transform: translateY(-50%);
-           }
-
-           .robot-icon {
-               background: rgba(255, 255, 255, 0.15);
-               border-radius: 50%;
-               width: 80px;
-               height: 80px;
-               display: flex;
-               align-items: center;
-               justify-content: center;
-               margin: 0 auto 10px;
-           }
-
-           .white-icon {
-               color: white;
-               font-size: 32px;
-           }
-
-           .bot-name {
-               color: white;
-               font-size: 14px;
-               margin-top: 5px;
-           }
-
-           .signup-section {
-               text-align: center;
-               padding: 20px;
-           }
-
-           .signup-section h2 {
+           .featured-project h2 {
                margin: 0 0 10px 0;
            }
 
-           .signup-section p {
-               margin: 0 0 20px 0;
+           .ai-list {
+               margin: 15px 0;
+               text-align: center;
+           }
+           
+           .ai-list .separator {
+               margin: 0 15px;
+               color: rgba(255, 255, 255, 0.7);
            }
 
-           .email-form {
-               display: flex;
-               justify-content: center;
-               gap: 10px;
-               max-width: 500px;
-               margin: 20px auto;
+           .section-container {
+               max-width: 1200px;
+               margin: 40px auto;
+               padding: 0 20px;
            }
 
-           .email-input {
-               padding: 12px 20px;
-               border: 2px solid #ddd;
-               border-radius: 6px;
-               width: 300px;
-               font-size: 16px;
+           .section-box {
+               background: white;
+               border-radius: 12px;
+               padding: 20px;
+               margin-bottom: 40px;
+               box-shadow: 0 4px 6px rgba(0,0,0,0.1);
            }
 
-           .signup-button {
-               background: #425B76;
-               color: white;
-               padding: 12px 24px;
-               border-radius: 6px;
-               border: none;
-               font-weight: bold;
-               cursor: pointer;
+           .section-title {
+               text-align: center;
+               margin: 0 0 15px 0;
+               color: #425B76;
+               font-size: 1.8em;
            }
 
-           .signup-button:hover {
-               opacity: 0.9;
+           .section-description {
+               text-align: center;
+               color: #666;
+               margin-bottom: 20px;
            }
 
            .grid-container {
                display: grid;
-               grid-template-columns: repeat(3, 1fr);
+               grid-template-columns: repeat(2, 1fr);
                gap: 30px;
-               max-width: 1200px;
-               margin: 20px auto;
-               padding: 0 20px;
+               margin-top: 20px;
            }
 
            .grid-item {
                background: white;
-               padding: 30px;
+               padding: 20px;
                border-radius: 12px;
                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
                display: flex;
@@ -184,7 +134,6 @@
 
            .grid-item:nth-child(1) { background-color: #e8f5e9; }
            .grid-item:nth-child(2) { background-color: #e3f2fd; }
-           .grid-item:nth-child(3) { background-color: #fff3e0; }
 
            .icon-container {
                background: white;
@@ -194,31 +143,31 @@
                display: flex;
                align-items: center;
                justify-content: center;
-               margin-bottom: 20px;
+               margin-bottom: 15px;
                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
            }
 
            .icon-color {
                color: #425B76;
-               font-size: 32px;
+               font-size: 24px;
            }
 
            .grid-item h3 {
-               margin: 0 0 15px 0;
+               margin: 0 0 10px 0;
                color: #333;
-               font-size: 1.5rem;
+               font-size: 1.3rem;
            }
 
            .grid-item p {
                color: #666;
-               margin: 0 0 20px 0;
+               margin: 0 0 15px 0;
                flex-grow: 1;
            }
 
            .button {
                background: white;
                color: #425B76;
-               padding: 12px 24px;
+               padding: 10px 20px;
                border-radius: 6px;
                text-decoration: none;
                font-weight: bold;
@@ -229,7 +178,46 @@
            .button:hover {
                background: #425B76;
                color: white;
+           }
+
+           .cta-button {
+               background: white;
+               color: #425B76;
+               padding: 10px 20px;
+               border-radius: 6px;
                text-decoration: none;
+               font-weight: bold;
+               display: inline-block;
+               margin-top: 10px;
+               transition: all 0.2s;
+           }
+
+           .cta-button:hover {
+               background: #0000f5;
+               color: white;
+           }
+
+           .about-section {
+               background: white;
+               padding: 20px;
+               margin: 40px auto;
+               max-width: 800px;
+               border-radius: 12px;
+               box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+               text-align: center;
+           }
+
+           .venn-diagram {
+               max-width: 400px;
+               margin: 20px auto;
+               display: block;
+           }
+
+           .text-content {
+               max-width: 800px;
+               margin: 0 auto;
+               line-height: 1.6;
+               color: #444;
            }
 
            footer {
@@ -237,34 +225,21 @@
                padding: 20px;
                color: #666;
                margin-top: 20px;
-               position: relative;
            }
-        </style>  
 
-        <link rel="stylesheet" href="src/styles/holdllm.css">
+           iframe {
+               max-width: 100%;
+           }
 
-        <style>
-            .spinner-container {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                min-height: 300px;
-            }
+           a {
+               color: #2B6D5E;
+               text-decoration: none;
+           }
 
-            .spinner {
-                width: 50px;
-                height: 50px;
-                border: 5px solid #f3f3f3;
-                border-top: 5px solid #425B76;
-                border-radius: 50%;
-                animation: spin 1s linear infinite;
-            }
-
-            @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-            }
-        </style>
+           a:hover {
+               color: #425B76;
+           }
+       </style>
    </head>
    <body>
        <div class="header">
@@ -273,62 +248,98 @@
 
        <div class="hero-section">
            <div class="main-content">
-               <h1>Texas Hold'LLM</h1>
-               <div class="layout">
-                    <div id="visualization-container"></div>
-                    <div id="debug-container"></div>
-                </div>
+               <a href="https://holdllm.com">
+                   <img src="holdllm.png" alt="Hold'LLM Poker Game Interface" class="game-screenshot">
+               </a>
+               
+               <div class="featured-project">
+                   <h2>Introducing Hold'LLM</h2>
+                   <p>Watch top AI models compete in real-time poker matches</p>
+                   <div class="ai-list">
+                       Anthropic's Claude <i class="fas fa-robot separator"></i> 
+                       OpenAI's ChatGPT <i class="fas fa-robot separator"></i> 
+                       Google's Gemini <i class="fas fa-robot separator"></i> 
+                       xAI's Grok
+                   </div>
+                   <a href="https://holdllm.com" class="cta-button">Watch Hold'LLM Live</a>
+               </div>
+
+               <div class="featured-project">
+                   <h2>Think you can beat the LLMs?</h2>
+                   <p>Play against them yourself! Sign up to get notified when we launch.</p>
+                   <iframe src="https://overbetai.substack.com/embed" width="480" height="150" style="border:1px solid #EEE; background:white;" frameborder="0" scrolling="no"></iframe>
+               </div>
            </div>
        </div>
 
-       <div class="signup-section">
-           <h2>Think you could do better?</h2>
-           <!-- <p>Check out the prompts that we used here. Think you could do better? </p> -->
-           <p>Sign up to get notified when we launch!</p>
-           <!-- <div style="position: relative; width: 480px; height: 70px; overflow: hidden;">
-            <iframe
-              src="https://overbetai.substack.com/embed"
-              width="480"
-              height="320"
-              style="border: 1px solid #EEE; background: white; position: relative; top: -170px;"
-              frameborder="0"
-              scrolling="no"
-            ></iframe>
-          </div> -->
-           <iframe src="https://overbetai.substack.com/embed" width="480" height="150" style="border:1px solid #EEE; background:white;" frameborder="0" scrolling="no"></iframe>
+       <div class="section-container">
+           <div class="section-box">
+               <h2 class="section-title">Overbet.ai</h2>
+               <img src="venn.svg" alt="Venn diagram showing the intersection of AI and Game Strategy" class="venn-diagram">
+               <div class="text-content">
+                   <p>Starting with Hold'LLM, we're working on building interactive games, challenges, and educational tools.</p>
+               </div>
+           </div>
 
-       <div class="grid-container">
-           <div class="grid-item">
-               <div class="icon-container">
-                   <i class="fas fa-solid fa-diamond icon-color"></i>
+           <div class="section-box">
+               <h2 class="section-title">Interactive Challenges</h2>
+               <div class="grid-container">
+                   <div class="grid-item">
+                       <div class="icon-container">
+                           <i class="fas fa-solid fa-robot icon-color"></i>
+                       </div>
+                       <h3>Hold'LLM Challenge</h3>
+                       <p>Compete against the top AI models in poker</p>
+                       <a href="https://holdllm.com" class="button">Coming Soon</a>
+                   </div>
+                   <div class="grid-item">
+                       <div class="icon-container">
+                           <i class="fas fa-regular fa-hand-back-fist icon-color"></i>
+                       </div>
+                       <h3>Daily RPS Challenge</h3>
+                       <p>Test your skills in our daily rock paper scissors challenge</p>
+                       <a href="#" class="button">Coming Soon</a>
+                   </div>
                </div>
-               <h3>Cards to Code</h3>
-               <p>Build your first AI poker bot and learn the fundamentals of game theory</p>
-               <a href="#" class="button">Go (soon)</a>
-               <!-- <a href="https://cardstocode.com" class="button">Go</a> -->
            </div>
-           <div class="grid-item">
-               <div class="icon-container">
-                   <i class="fas fa-solid fa-brain icon-color"></i>
+
+           <div class="section-box">
+               <h2 class="section-title">Upcoming Courses</h2>
+               <div class="grid-container">
+                   <div class="grid-item">
+                       <div class="icon-container">
+                           <i class="fas fa-solid fa-diamond icon-color"></i>
+                       </div>
+                       <h3>Cards to Code</h3>
+                       <p>Build your first classic AI poker bot and learn about game theory</p>
+                       <a href="#" class="button">Coming Soon</a>
+                   </div>
+                   <div class="grid-item">
+                       <div class="icon-container">
+                           <i class="fas fa-solid fa-brain icon-color"></i>
+                       </div>
+                       <h3>RPS Opponent Modeling</h3>
+                       <p>Master opponent modeling through the game of rock paper scissors</p>
+                       <a href="#" class="button">Coming Soon</a>
+                   </div>
                </div>
-               <h3>RPS Opponent Modeling</h3>
-               <p>Master opponent modeling through the classic game of rock paper scissors</p>
-               <a href="#" class="button">Go (soon)</a>
-               <!-- <a href="https://rps.bot" class="button">Go</a> -->
            </div>
-           <div class="grid-item">
-               <div class="icon-container">
-                   <i class="fas fa-regular fa-hand-back-fist icon-color"></i>
+
+           <div class="section-box">
+               <div class="icon-container" style="margin: 0 auto 15px;">
+                   <i class="fa-solid fa-chart-line icon-color"></i>
                </div>
-               <h3>Daily RPS Challenge</h3>
-               <p>Test your skills in our daily rock paper scissors challenge</p>
-               <a href="#" class="button">Play (soon)</a>
-               <!-- <a href="https://overbet.ai/daily" class="button">Play</a> -->
+               <h2 class="section-title">Expected Value Foundation</h2>
+               <div class="text-content">
+                   <p>Our nonprofit to help people explore expected value through fun and practical applications.</p>
+                   <p>We're excited about in-person learning, including <a href="https://poker.camp">Poker Camp</a>, a program to teach AI, math, and better reasoning through poker. We ran an in-person AI Poker Camp in summer 2024 in San Francisco and plan to run more events in 2025.</p>
+               </div>
+               <div style="text-align: center; margin-top: 20px;">
+                   <a href="https://expectedvalue.org" class="button">Learn More</a>
+               </div>
            </div>
        </div>
 
        <footer>© 2024 Overbet.ai</footer>
-
-       <script type="module" src="src/index.jsx"></script>
    </body>
 </html>

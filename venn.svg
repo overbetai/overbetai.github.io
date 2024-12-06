@@ -1,0 +1,16 @@
+<svg viewBox="0 0 600 360" xmlns="http://www.w3.org/2000/svg">
+  <!-- Wider circles with even less overlap - moved centers further apart -->
+  <circle cx="200" cy="180" r="180" fill="#2B6D5E" opacity="0.8"/>
+  <circle cx="400" cy="180" r="180" fill="#2B4D8C" opacity="0.8"/>
+  
+  <!-- Left label with smaller Artificial Intelligence -->
+  <text x="100" y="160" fill="white" font-size="24" font-family="Arial" font-weight="bold" text-anchor="middle">Artificial</text>
+  <text x="100" y="200" fill="white" font-size="24" font-family="Arial" font-weight="bold" text-anchor="middle">Intelligence</text>
+  
+  <!-- Right label with smaller Game Strategy -->
+  <text x="500" y="160" fill="white" font-size="24" font-family="Arial" font-weight="bold" text-anchor="middle">Game</text>
+  <text x="500" y="200" fill="white" font-size="24" font-family="Arial" font-weight="bold" text-anchor="middle">Strategy</text>
+  
+  <!-- Intersection label -->
+  <text x="300" y="180" fill="white" font-size="30" font-family="Arial" font-weight="bold" text-anchor="middle">Overbet.ai</text>
+</svg>
