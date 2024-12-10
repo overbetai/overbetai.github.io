@@ -7,7 +7,33 @@
     padding: 20px;
     min-height: 300px;
 }
+#prompt-container {
+    grid-column: 2;  /* Place in second column */
+    grid-row: 2;     /* Place below debug container */
+    box-sizing: border-box;
+    color: black;
+    text-align: left;
+    padding: 20px;
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+}
 
+/* Ensure visualization container spans full height */
+#visualization-container {
+    grid-row: 1 / span 2;  /* Span both rows in first column */
+}
+
+/* Adjust prompt container for mobile */
+@media (max-width: 1023px) {
+    #prompt-container {
+        grid-column: 1;  /* Full width on mobile */
+        grid-row: 3;     /* Below both other containers */
+    }
+    
+    #visualization-container {
+        grid-row: 1;     /* Reset to single row on mobile */
+    }
+}
 /* Add media query for wider screens */
 @media (min-width: 1024px) {
     .layout {
