@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily RPS Challenge | Overbet.ai</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/python/python.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        h1, h2 { color: #333; }
+        .section { margin-bottom: 30px; }
+        
+        .hidden {
+            display: none;
+        }
+        
+        button:hover { background-color: #45a049; }
+        
+        button, button.submit {
+            position: relative;
+            padding: 8px 16px;
+            font-size: 14px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        button span {
+            transition: all 0.2s;
+        }
+        
+        button.loading-spinner span {
+            visibility: hidden;
+            opacity: 0;
+        }
+        
+        button.loading-spinner::after {
+            content: "";
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            margin: auto;
+            border: 4px solid transparent;
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: button-loading-spinner 1s ease infinite;
+        }
+
+        @keyframes button-loading-spinner {
+            from {
+                transform: rotate(0turn);
+            }
+            
+            to {
+                transform: rotate(1turn);
+            }
+        }
+        
+        .tablinks {
+            color: #000;
+        }
+        
+        .tab {
+            color: #000;
+            overflow: hidden;
+            background-color: #f0f0f0;
+            display: flex;
+        }
+        .tab button {
+            background-color: #e0e0e0;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+            flex-grow: 1;
+            border-radius: 10px 10px 0 0;
+            margin-right: 2px;
+            border: 1px solid #ccc;
+            border-bottom: none;
+        }
+        .tab button:last-child {
+            margin-right: 0;
+        }
+        .tab button:hover {
+            background-color: #ddd;
+        }
+        .tab button.active {
+            background-color: #fff;
+        }
+        .tabcontent {
+            display: none;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+        }
+        
+    </style>
+    <style>
+        #scoreDetails {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .goal-text {
+            font-size: 14px;
+            margin-bottom: 1em;
+        }
+        
+        .pie-chart {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            position: relative;
+        }
+        
+        .positive-slice, .negative-slice, .mask-slice {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            clip: rect(0, 100px, 100px, 50px);
+            transition: transform 0.2s;
+        }
+        .positive-slice {
+            background: #4CAF50;
+        }
+        .negative-slice {
+            background: #FF5733;
+        }
+        .mask-slice {
+            background: #f0f0f0;
+        }
+        /*.mask-slice.active-slice {*/
+        /*    background: #000;*/
+        /*}*/
+        
+        .pie-center {
+            width: 60px;
+            height: 60px;
+            margin-top: 20px;
+            margin-left: 20px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            position: relative;
+        }
+        
+        .pie-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            position: relative;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        
+        .progress {
+            height: 100%;
+            position: absolute;
+            background-color: #4CAF50;
+            transition: width 0.5s ease-in-out;
+        }
+        
+        .progress-text {
+            position: absolute;
+            top: 2px;
+            left: 1em;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+        }
+    </style>
+    <style>
+        .validation-status {
+            background-color: #FFDDDD;
+            border: 1px solid #FFB3BA;;
+            border-radius: 0.5em;
+            padding: 1em;
+        }
+        
+        #code-editor {
+            position: relative;
+            width: 100%;
+            margin-top: 1em;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+        .CodeMirror {
+            height: auto;
+        }
+        .CodeMirror-scroll {
+        }
+        .fixed-text .CodeMirror {
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            padding: 3px;
+            padding-left: 0.5em;
+        }
+        .editor {
+            margin-bottom: 10px;
+        }
+        .fixed-text {
+            margin-top: 10px;
+        }
+        .editor, .fixed-text {
+            /*width: 100%;*/
+        }
+        
+        .toggle-container {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #999;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .toggle-label {
+            margin: 0 10px;
+        }
+    </style>
+    <style>
+        table { border-collapse: collapse; margin-top: 20px; table-layout: fixed;}
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; width: 3em; text-align: center;}
+        th { background-color: #f2f2f2; }
+        #gameStatus { font-weight: bold; margin-top: 10px; }
+        
+        .rock { background-color: #FFB3BA; }
+        .paper { background-color: #BAE1FF; }
+        .scissors { background-color: #BAFFC9; }
+        .pay1, .pay0, .pay-1 {
+            color: white;
+            font-weight: bold;
+        }
+        .pay1 { background-color: #4CAF50; }
+        .pay0 { color: #999; }
+        .pay-1 {background-color: #FF5733; }
+        
+        .left-column {
+            width: 12em;
+            padding-right: 20px;
+            border-right: 1px solid #ccc;
+            height: calc(100vh - 30px);
+            overflow-y: auto;
+            box-sizing: border-box;
+        }
+        .right-column {
+            flex-grow: 1;
+            padding-left: 20px;
+            box-sizing: border-box;
+            max-width: 80em;
+        }
+        .container {
+            display: flex;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Daily RPS Challenge</h1>
+    <div class="container">
+        <div class="left-column">
+            <button id="startGameBtn" onclick="startGame()" class="hidden">Start</button>
+            <button id="stopGameBtn" onclick="stopGame()" class="hidden">Stop</button>
+            <div id="gameStatus" class="hidden"></div>
+            <div id="scoreDetails">
+                <div class="goal-text hidden">
+                    Goal: +75% and +50 points
+                </div>
+                <div class="pie-chart">
+                    <div class="positive-slice base-slice"></div>
+                    <div class="negative-slice base-slice" style="transform:rotate(180deg);"></div>
+                    <div class="mask-slice base-slice" style="transform:rotate(180deg);"></div>
+                    <div class="positive-slice active-slice" style="display:none;"></div>
+                    <div class="negative-slice active-slice" style="display:none;transform:rotate(180deg);"></div>
+                    <div class="mask-slice active-slice"></div>
+                    <div class="pie-center"></div>
+                    <div class="pie-text"></div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress"></div>
+                    <div class="progress-text"></div>
+                </div>
+            </div>
+            <table id="gameResults">
+                <thead>
+                    <tr>
+                        <th>You</th>
+                        <th>House</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        
+        <div class="right-column">
+            <div class="tab">
+                <button class="tablinks" onclick="openTab(event, 'Edit Code')" id="defaultOpen">Edit Code</button>
+                <button class="tablinks" onclick="openTab(event, 'Upload File')">Upload File</button>
+                <!--<button class="tablinks" onclick="openTab(event, 'Link Repo')">Link Repo</button>-->
+            </div>
+            
+            <div id="Edit Code" class="tabcontent">
+                <div style="margin-bottom:1em"><em>(Edit the code below, then press "Submit".)</em></div>
+                <button class="submit" onclick="submitCode({only_if_not_exists: false})"><span>Submit</span></button><span id="submitStatus" class="submission-status" style="margin-left:0.5em"></span>
+                <pre class="validation-status hidden"></pre>
+                <div id="code-editor"></div>
+            </div>
+            
+            <div id="Upload File" class="tabcontent">
+                <form id="uploadForm" enctype="multipart/form-data">
+                <div style="margin-bottom:5px"><input type="file" id="file" name="file" accept=".py" required></div>
+                <button type="submit" class="submit"><span>Upload File</span></button><span id="uploadStatus" class="submission-status" style="margin-left:0.5em"></span>
+                <pre class="validation-status hidden"></pre>
+                </form>
+                <hr/>
+                The file you upload should be a Python file that looks something like this. <!--You can download this file in the [rps-engine repo](https://github.com/pokercamp/rps-engine) at `players/default/player.py` and for more info on testing see: [Game Engine](botguide.qmd#game-engine).-->
+                <div class="sourceCode" id="cb1">
+<pre class="sourceCode python code-with-copy">
+# Simple example bot, written in Python.
+
+from skeleton.actions import RockAction, PaperAction, ScissorsAction
+from skeleton.bot import Bot
+from skeleton.runner import parse_args, run_bot
+
+import random
+
+class Player(Bot):
+    # A bot for playing Rock-Paper-Scissors.
+
+    def __init__(self):
+        # Called when a new matchup starts. Called exactly once.
+        
+        self.my_profit = 0
+        self.history = []
+
+    def get_action(self, *, match_clock):
+        # Called each time the engine needs an action from your bot.
+        #
+        # Returns a RockAction(), PaperAction(), or ScissorsAction().
+        
+        return random.choice([RockAction(), PaperAction(), ScissorsAction()])
+
+    def handle_results(self, *, my_action, their_action, my_payoff, match_clock):
+        # Called after each round.
+        
+        self.history.append((my_action, their_action, my_payoff))
+        self.my_profit += my_payoff
+
+if __name__ == '__main__':
+    run_bot(Player(), parse_args())
+</pre>
+                </div>
+            </div>
+            
+            <!--<div id="Link Repo" class="tabcontent">
+            <p>Coming soon! Ask if you'd like to use this to upload multiple files or something else that doesn't fit into a `player.py` file.</p>
+            </div>-->
+        </div>
+    </div>
+
+    <script>
+        /*global localStorage */
+        
+        let editors = [];
+        let fixedEditors = [];
+        let enable_autosave = false;
+        
+        function generateRandomHex(length) {
+            const characters = '0123456789abcdef';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+            return result;
+        }
+
+        // Function to get or create rcid
+        function getRcid() {
+            let rcid = localStorage.getItem('rcid');
+            if (!rcid) {
+                rcid = 'obai-rcid-' + generateRandomHex(16);
+                localStorage.setItem('rcid', rcid);
+            }
+            return rcid;
+        }
+        
+        function getUsernameAndToken() {
+            // let username = 'obai-user';
+            // let token = 'obai-user';
+            // return { username, token };
+            let username = localStorage.getItem('github_username');
+            let token = localStorage.getItem('github_oauth_token');
+            
+            if (!username) {
+                const rcid = getRcid();
+                username = rcid;
+                token = rcid;
+            }
+            
+            return { username, token };
+        }
+        
+        const initialCode = [
+            [0,`import random`, true],
+            [4,`# You can add class-level attributes here if needed`, true],
+            [8,`# Called when a new matchup starts. Called exactly once.
+self.my_profit = 0
+self.history = []`, true],
+            [8,`# Called each time the engine needs an action from your bot.
+#
+# Should return a RockAction(), PaperAction(), or ScissorsAction().
+return random.choice([RockAction(), PaperAction(), ScissorsAction()])`, false],
+            [8,`# Called after each round.
+if not hasattr(self, 'my_profit'):
+    self.my_profit = 0
+if not hasattr(self, 'history'):
+    self.history = []
+self.history.append((my_action, their_action, my_payoff))
+self.my_profit += my_payoff`, false],
+        ];
+        
+        const fixedCode = [
+            [0, `from skeleton.actions import RockAction, PaperAction, ScissorsAction
+        from skeleton.bot import Bot
+        from skeleton.runner import parse_args, run_bot`, true],
+            [0, `class Player(Bot):`, ],
+            [4, `def __init__(self):`, true],
+            [4, `def get_action(self, *, match_clock):`, false],
+            [4, `def handle_results(self, *, my_action, their_action, my_payoff, match_clock):`, false],
+            [0, `if __name__ == '__main__':
+            run_bot(Player(), parse_args())`, true]
+        ];
+        
+        function initializeEditor() {
+            const codeEditor = document.getElementById("code-editor");
+            codeEditor.innerHTML = ''; // Clear existing content
+            
+            for (let i = 0; i < fixedCode.length; i++) {
+                addFixedText(codeEditor, i);
+                if (i < initialCode.length) {
+                    createEditor(codeEditor, i);
+                }
+            }
+        
+            // Set up autosave after editors are created
+            setupAutosave();
+        }
+        
+        function addFixedText(parent, index) {
+            const fixedTextDiv = document.createElement('div');
+            fixedTextDiv.className = 'fixed-text';
+            fixedTextDiv.setAttribute('style', `padding-left: ${fixedCode[index][0]}em`);
+            if (fixedCode[index][2]) {
+                fixedTextDiv.classList.add('expert-code', 'hidden')
+            }
+            parent.appendChild(fixedTextDiv);
+        
+            fixedEditors[index] = CodeMirror(fixedTextDiv, {
+                value: fixedCode[index][1],
+                mode: "python",
+                theme: "default",
+                readOnly: true,
+                lineNumbers: false,
+                lineWrapping: true,
+                indentUnit: 4,
+                tabSize: 4,
+            });
+        }
+        
+        function createEditor(parent, index) {
+            const editorDiv = document.createElement('div');
+            editorDiv.className = 'editor';
+            editorDiv.setAttribute('style', `padding-left: ${initialCode[index][0]+0.5}em`);
+            if (initialCode[index][2]) {
+                editorDiv.classList.add('expert-code', 'hidden')
+            }
+            parent.appendChild(editorDiv);
+        
+            editors[index] = CodeMirror(editorDiv, {
+                value: initialCode[index][1],
+                mode: "python",
+                theme: "default",
+                lineNumbers: false,
+                indentUnit: 4,
+                tabSize: 4,
+                indentWithTabs: false,
+                lineWrapping: true,
+                viewportMargin: Infinity,
+                extraKeys: {
+                    "Enter": function(cm) {
+                        cm.replaceSelection("\n");
+                        cm.refresh();
+                    }
+                }
+            });
+        
+            // Add change listener to each editor
+            editors[index].on('change', function(cm) {
+                autoSave();
+                cm.refresh();
+            });
+        
+            // Ensure the editor is properly sized
+            setTimeout(() => editors[index].refresh(), 1);
+        }
+        
+        function setupAutosave() {
+            enable_autosave = true;
+        }
+        
+        function autoSave() {
+            if (!enable_autosave) {
+                return;
+            }
+            
+            console.log('autosave');
+            const savedCode = editors.map(editor => editor.getValue());
+            localStorage.setItem('autoSavedCode', JSON.stringify(savedCode));
+        }
+        
+        function refreshAllEditors() {
+            editors.forEach(editor => {
+                editor.refresh();
+            });
+        }
+        
+        function refreshAllCodeMirrors() {
+            editors.forEach(editor => editor.refresh());
+            fixedEditors.forEach(editor => editor.refresh());
+        }
+        
+        function loadSavedCode() {
+            console.log('load');
+            const savedCode = JSON.parse(localStorage.getItem('autoSavedCode'));
+            if (savedCode && editors.length === savedCode.length) {
+                editors.forEach((editor, index) => {
+                    editor.setValue(savedCode[index]);
+                    editor.refresh();  // Refresh each editor after setting value
+                });
+            }
+            refreshAllEditors();  // Refresh all editors after loading
+            submitCode({only_if_not_exists: true});
+        }
+        
+        function toggleMode() {
+            const isAdvanced = document.getElementById('modeToggle').checked;
+            const expertElements = document.querySelectorAll('.expert-code');
+            
+            expertElements.forEach(element => {
+                if (isAdvanced) {
+                    element.classList.remove('hidden');
+                } else {
+                    element.classList.add('hidden');
+                }
+            });
+            
+            // Refresh CodeMirror instances after toggling
+            refreshAllCodeMirrors();
+        }
+        
+        // Modify the initializeEditor function
+        function initializeEditor() {
+            const codeEditor = document.getElementById("code-editor");
+            codeEditor.innerHTML = `
+                <div class="toggle-container">
+                    <span class="toggle-label">Simple</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="modeToggle" onchange="toggleMode()">
+                        <span class="slider"></span>
+                    </label>
+                    <span class="toggle-label">Advanced</span>
+                </div>
+            `;
+            
+            for (let i = 0; i < fixedCode.length; i++) {
+                addFixedText(codeEditor, i);
+                if (i < initialCode.length) {
+                    createEditor(codeEditor, i);
+                }
+            }
+        
+            // Set up autosave after editors are created
+            setupAutosave();
+        }
+
+        // Modify the window load event listener
+        window.addEventListener('load', function() {
+            initializeEditor();
+            loadSavedCode();
+            document.getElementById("defaultOpen").click();
+            // Add a delay before refreshing to ensure DOM is fully rendered
+            setTimeout(() => {
+                refreshAllCodeMirrors();
+                toggleMode(); // Initialize the visibility based on the toggle state
+            }, 100);
+        });
+        
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.classList.add("active");
+            setTimeout(refreshAllCodeMirrors, 10); // Add this line
+        }
+        
+        function formatDateMaybe(date) {
+            const today = new Date();
+            if (date.toDateString() === today.toDateString()) {
+                return date.toLocaleTimeString();
+            } else {
+                return formatDate(date);
+            }
+        }
+        
+        function submitCode({only_if_not_exists=false}) {
+            document.querySelectorAll('.submit').forEach((element) => {
+                element.classList.add('loading-spinner');
+            });
+            document.querySelectorAll('.submission-status').forEach((element) => {
+                element.textContent = 'Submitting...';
+            });
+            autoSave();
+            const { username, token } = getUsernameAndToken();
+            
+            const data = {
+                'username': username,
+                'token': token,
+                'snippets': {}
+            };
+            
+            // Map the editors to their respective snippet keys
+            const snippetKeys = ['imports', 'classlevel', 'init', 'get_action', 'handle_results'];
+            editors.forEach((editor, index) => {
+                data['snippets'][snippetKeys[index]] = {
+                    'contents': editor.getValue(),
+                    'indent': initialCode[index][0]
+                };
+            });
+        
+            var route = 'https://staff-dev1.poker.camp:7443/overbet/api/submit/daily'
+            if (false && only_if_not_exists) {
+                route = 'https://staff-dev1.poker.camp:7443/overbet/api/submit-if-not-exists/daily'
+            }
+            fetch(route, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                document.querySelectorAll('.submit').forEach((element) => {
+                    element.classList.remove('loading-spinner');
+                });
+                return response.json();
+            })
+            .then(result => {
+                document.querySelectorAll('.submission-status').forEach((element) => {
+                    element.textContent = `${result.message} at ${formatDateMaybe(new Date())}`;
+                });
+                document.querySelectorAll('.submit').forEach((element) => {
+                    element.classList.remove('loading-spinner');
+                });
+                console.log('Success:', result);
+            })
+            .catch((error) => {
+                document.querySelectorAll('.submission-status').forEach((element) => {
+                    element.textContent = 'Error: ' + error.message;
+                });
+                document.querySelectorAll('.submit').forEach((element) => {
+                    element.classList.remove('loading-spinner');
+                });
+                console.error('Error:', error);
+            });
+        }
+        
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            const fileField = document.querySelector('input[type="file"]');
+            const { username, token } = getUsernameAndToken();
+            
+            formData.append('file', fileField.files[0]);
+            formData.append('username', username);
+            formData.append('token', token);
+        
+            fetch('https://staff-dev1.poker.camp:7443/overbet/api/upload/daily', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(result => {
+                document.getElementById('uploadStatus').textContent = result.message;
+                console.log('Success:', result);
+            })
+            .catch(error => {
+                document.getElementById('uploadStatus').textContent = 'Error: ' + error.message;
+                console.error('Error:', error);
+            });
+        });
+    </script>
+
+    <script>
+        let editor;
+        let socket;
+        let roundCounter = 0;
+        let cumulativeScore = 0;
+
+        function startGame() {
+            const { username, token } = getUsernameAndToken();
+            console.log(`Attempting to connect with username: ${username} to https://staff-dev1.poker.camp:7443/overbet/api/play/daily`);
+            
+            socket = io(`https://staff-dev1.poker.camp:7443/overbet/api/play/daily`, {
+                transports: ['websocket'],
+                forceNew: true,
+                reconnection: true,
+                reconnectionAttempts: 3,
+                EIO: 4
+            });
+            
+            socket.on('connect_error', (error) => {
+                console.error("Connection error:", error);
+                document.getElementById('gameStatus').textContent = 'Connection error: ' + error.message;
+            });
+    
+            socket.on('connect', () => {
+                console.log("Socket.IO connection established");
+                // document.getElementById('startGameBtn').classList.add('hidden');
+                // document.getElementById('stopGameBtn').classList.remove('hidden');
+                socket.emit('join', { username: username });
+            });
+            
+            socket.on('join', (data) => {
+                console.log("Joined room:", data);
+            });
+    
+            socket.on('match_update', (data) => {
+                console.log("Received match update:", data);
+                updateGameResults(data);
+            });
+            
+            socket.on('validation_status', function(data) {
+                console.log('Validation status:', data.status);
+                if (data.status === 'pending') {
+                    document.querySelectorAll('.submission-status').forEach((element) => {
+                        element.textContent = 'Validating...';
+                    });
+                } else if (data.status === 'success') {
+                    console.log('Submission validated successfully. New match starting...');
+                    document.querySelectorAll('.validation-status').forEach((element) => {
+                        element.textContent = "";
+                        element.classList.add('hidden');
+                    });
+                    socket.emit('start_match', { username: username });
+                } else if (data.status === 'failed') {
+                    console.log('Submission validation failed');
+                    console.log(data);
+                    document.querySelectorAll('.validation-status').forEach((element) => {
+                        if (data.content) {
+                            element.textContent = data.content;
+                            element.classList.remove('hidden');
+                        } else {
+                            element.textContent = "";
+                            element.classList.add('hidden');
+                        }
+                    });
+                }
+            });
+
+            socket.on('clear_results', function() {
+                resetGameUI();
+            });
+            
+            socket.on('match_terminated', function(data) {
+                console.log('Match terminated:', data.message);
+                document.getElementById('gameStatus').textContent = 'Match terminated';
+                resetGameUI();
+            });
+    
+            socket.on('disconnect', (reason) => {
+                console.log("Socket.IO connection closed:", reason);
+                // resetGameUI();
+            });
+    
+            socket.on('error', (error) => {
+                console.error("Socket error:", error);
+                document.getElementById('gameStatus').textContent = 'Socket error: ' + error.message;
+            });
+        }
+
+        function stopGame() {
+            if (socket) {
+                socket.close();
+            }
+            // document.getElementById('startGameBtn').classList.remove('hidden');
+            // document.getElementById('stopGameBtn').classList.add('hidden');
+            document.getElementById('gameStatus').textContent = '';
+        }
+        
+        function updateScoreVisualizations() {
+            const averageScore = roundCounter > 0 ? cumulativeScore / roundCounter : 0;
+            const percentage = averageScore;
+            const isPositive = averageScore >= 0;
+            
+            const degrees = percentage * 180;
+
+            // Update pie chart
+            const activePieSlice = isPositive ? document.querySelector('.positive-slice.active-slice') : document.querySelector('.negative-slice.active-slice');
+            (isPositive ? document.querySelector('.negative-slice.active-slice') : document.querySelector('.positive-slice.active-slice')).style.display = 'none';
+            const activeMaskSlice = document.querySelector('.mask-slice.active-slice');
+            const pieText = document.querySelector('.pie-text');
+
+            if (isPositive) {
+                if (averageScore > 0) {
+                    document.querySelectorAll('.negative-slice').forEach((slice) => {
+                        slice.style.display = 'none';
+                        console.log(slice);
+                    });
+                    document.querySelectorAll('.positive-slice').forEach((slice) => {
+                        slice.style.display = 'block';
+                    });
+                }
+                activePieSlice.style.transform = `rotate(${(percentage - 0.5) * 360}deg)`;
+                activeMaskSlice.style.transform = `rotate(${(percentage + 0) * 360}deg)`;
+                document.querySelector('.mask-slice.base-slice').style.transform = 'rotate(180deg)';
+                if (percentage > 0.5) {
+                    activePieSlice.style.display = 'block';
+                    activeMaskSlice.style.display = 'none';
+                } else {
+                    activePieSlice.style.display = 'none';
+                    activeMaskSlice.style.display = 'block';
+                }
+            } else {
+                if (averageScore < 0) {
+                    document.querySelectorAll('.negative-slice').forEach((slice) => {
+                        slice.style.display = 'block';
+                    });
+                    document.querySelectorAll('.positive-slice').forEach((slice) => {
+                        slice.style.display = 'none';
+                        console.log(slice);
+                    });
+                }
+                document.querySelector('.mask-slice.base-slice').style.transform = 'rotate(0deg)';
+                activePieSlice.style.transform = `rotate(${(percentage - 0) * 360}deg)`;
+                activeMaskSlice.style.transform = `rotate(${(percentage + 0.5) * 360}deg)`;
+                if (percentage < -0.5) {
+                    activePieSlice.style.display = 'block';
+                    activeMaskSlice.style.display = 'none';
+                } else {
+                    activePieSlice.style.display = 'none';
+                    activeMaskSlice.style.display = 'block';
+                }
+            }
+            pieText.textContent = `${percentage > 0 ? '+' : ''}${(percentage * 100).toFixed(1)}%`;
+            pieText.style.color = isPositive ? '#4CAF50' : '#FF5733';
+
+            // Update progress bar
+            const progressBar = document.querySelector('.progress');
+            const progressText = document.querySelector('.progress-text');
+            const maxScore = 50;
+            const progressPercentage = Math.min(Math.max(cumulativeScore / maxScore, 0), 1);
+
+            progressBar.style.width = `${progressPercentage * 100}%`;
+            progressText.textContent = `${cumulativeScore} / ${maxScore}`;
+        }
+        
+        function updateGameResults(data) {
+            roundCounter++;
+            cumulativeScore += data.result;
+            const tableBody = document.querySelector("#gameResults tbody");
+            const row = tableBody.insertRow(0);
+            const your_cell = row.insertCell(0);
+            your_cell.textContent = data.your_action[0];
+            your_cell.classList.add(data.your_action.toLowerCase());
+            
+            const house_cell = row.insertCell(1);
+            house_cell.textContent = data.house_action[0];
+            house_cell.classList.add(data.house_action.toLowerCase());
+            
+            const result_cell = row.insertCell(2);
+            result_cell.textContent = `${data.result > 0 ? '+' : ''}${data.result}`;
+            result_cell.classList.add(`pay${data.result}`);
+            
+            truncateTableToNRows(tableBody, 100);
+            
+            updateScoreVisualizations();
+        }
+
+        function truncateTableToNRows(tableBody, n) {
+            while (tableBody.rows.length > n) {
+                tableBody.deleteRow(tableBody.rows.length - 1);
+            }
+        }
+
+        function resetGameUI() {
+            // document.getElementById('startGameBtn').classList.remove('hidden');
+            // document.getElementById('stopGameBtn').classList.add('hidden');
+            document.getElementById('gameStatus').textContent = 'Game stopped';
+            roundCounter = 0;
+            cumulativeScore = 0;
+            document.querySelector("#gameResults tbody").innerHTML = '';
+            
+            updateScoreVisualizations();
+        }
+        
+        window.addEventListener('load', function() {
+            startGame();
+        });
+    </script>
+</body>
+</html>
